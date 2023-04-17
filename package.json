@@ -1,8 +1,12 @@
 {
   "name": "vision-calling",
   "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "description": "Vision Calling frontend for my assignment for USW",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AshmitW/vision-calling.git"
+  },
+  "author": "Ashmit <samith.shetty3@gmail.com>",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -61,6 +65,5 @@
     "karma-jasmine-html-reporter": "~2.0.0",
     "ts-node": "~8.3.0",
     "typescript": "~4.8.4"
-  },
-  "description": "An Ionic project"
+  }
 }
