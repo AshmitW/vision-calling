@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
+import { UserService } from './services/user.service';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -14,11 +15,15 @@ export class AppComponent {
     { title: 'Home', url: '/home', icon: 'home' },
     { title: 'Messages', url: '/messages', icon: 'mail' },
   ];
-
   public logoutPages = [{ title: 'Logout', func: 'logout()', icon: 'log-out' }];
-  constructor() {}
+  private isLogged: boolean;
+
+  constructor(private userService: UserService) {
+    this.isLogged = this.userService.tokenValue ? true : false;
+  }
 
   logout() {
     console.log('Logout func called');
+    this.userService.logout();
   }
 }
