@@ -1,0 +1,6 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "Vision Calling",
+	"webDir": "www",
+	"bundledWebRuntime": false
+}

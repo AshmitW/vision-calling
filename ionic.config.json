@@ -1,0 +1,8 @@
+{
+  "name": "Vision Calling",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular",
+  "id": "27c44e52"
+}
