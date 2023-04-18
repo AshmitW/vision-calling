@@ -31,11 +31,15 @@ export class UserService {
   }
 
   public isAuthenticated(): boolean {
-    const token = JSON.parse(localStorage.getItem('user-token')).token;
-    // console.log(token);
-    // Check whether the token is expired and return
-    // true or false
-    return !this.jwtHelper.isTokenExpired(token);
+    if (localStorage.getItem('user-token')) {
+      const token = JSON.parse(localStorage.getItem('user-token')).token;
+      // console.log(token);
+      // Check whether the token is expired and return
+      // true or false
+      return !this.jwtHelper.isTokenExpired(token);
+    } else {
+      return false;
+    }
   }
 
   login(email: string, password: string) {

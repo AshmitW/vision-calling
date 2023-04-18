@@ -9,3 +9,11 @@ ion-content {
   overflow: hidden;
   margin-bottom: 15px;
 }
+
+@media (min-width: 1000px) {
+  ion-content {
+    --padding-top: 10%;
+    --padding-start: 30%;
+    --padding-end: 30%;
+  }
+}
