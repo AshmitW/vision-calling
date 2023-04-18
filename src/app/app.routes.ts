@@ -1,4 +1,5 @@
-import { Routes } from '@angular/router';
+import { Routes, CanActivate } from '@angular/router';
+import { AuthGuardService as AuthGuard } from './services/auth-guard.service';
 
 export const routes: Routes = [
   {
@@ -8,20 +9,24 @@ export const routes: Routes = [
   },
   {
     path: 'home',
-    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
+    loadComponent: () =>
+      import('./pages/home/home.page').then((m) => m.HomePage),
+    canActivate: [AuthGuard],
   },
   {
     path: 'messages',
     loadComponent: () =>
-      import('./messages/messages.page').then((m) => m.MessagesPage),
+      import('./pages/messages/messages.page').then((m) => m.MessagesPage),
+    canActivate: [AuthGuard],
   },
   {
     path: 'login',
-    loadComponent: () => import('./login/login.page').then((m) => m.LoginPage),
+    loadComponent: () =>
+      import('./pages/login/login.page').then((m) => m.LoginPage),
   },
   {
     path: 'signup',
     loadComponent: () =>
-      import('./signup/signup.page').then((m) => m.SignupPage),
+      import('./pages/signup/signup.page').then((m) => m.SignupPage),
   },
 ];

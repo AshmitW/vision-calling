@@ -1,0 +1,56 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Sign Up</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Signup</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <div class="input-group">
+    <ion-list>
+      <ion-item>
+        <ion-input
+          label="Username"
+          labelPlacement="floating"
+          type="text"
+          [(ngModel)]="username"
+          placeholder="abc"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="Email"
+          labelPlacement="floating"
+          type="email"
+          [(ngModel)]="email"
+          placeholder="email@example.com"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          label="Password"
+          labelPlacement="floating"
+          type="password"
+          minlength="8"
+          [(ngModel)]="password"
+          placeholder="********"
+        ></ion-input>
+      </ion-item>
+    </ion-list>
+    <ion-button
+      style="text-transform: none"
+      (click)="signUp()"
+      expand="block"
+      strong="true"
+      >Login</ion-button
+    >
+  </div>
+  <ion-loading [isOpen]="loading" message="Signing up"></ion-loading>
+</ion-content>

@@ -2,38 +2,39 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, MenuController, ToastController } from '@ionic/angular';
-import { ActivatedRoute, Router } from '@angular/router';
-import { UserService } from '../services/user.service';
+import { Router } from '@angular/router';
+import { UserService } from 'src/app/services/user.service';
 import { first } from 'rxjs';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.page.html',
-  styleUrls: ['./login.page.scss'],
+  selector: 'app-signup',
+  templateUrl: './signup.page.html',
+  styleUrls: ['./signup.page.scss'],
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule],
 })
-export class LoginPage implements OnInit {
-  loading = false;
-  submitted = false;
-  returnUrl: string;
+export class SignupPage implements OnInit {
+  loading: boolean = false;
+  username: string;
   email: string;
   password: string;
 
   constructor(
     public menuCtrl: MenuController,
-    private route: ActivatedRoute,
     private router: Router,
     private userService: UserService,
     private toastController: ToastController
   ) {}
 
-  ngOnInit() {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-  }
+  ngOnInit() {}
 
   ionViewWillEnter() {
+    this.loading = false;
     this.menuCtrl.enable(false);
+  }
+
+  ionViewWillLeave() {
+    this.loading = false;
   }
 
   async presentToast(message) {
@@ -46,23 +47,24 @@ export class LoginPage implements OnInit {
     await toast.present();
   }
 
-  login() {
-    this.submitted = true;
-
+  signUp() {
     // stop here if values are invalid
-    if (!this.email || !this.password) {
+    if (!this.username || !this.email || !this.password) {
       // console.log('Please fill in the email and password fields!');
-      this.presentToast('Please fill in the email and password fields!');
+      this.presentToast('Please fill in all the fields!');
       return;
     }
 
     this.loading = true;
     this.userService
-      .login(this.email, this.password)
+      .signUp(this.username, this.email, this.password)
       .pipe(first())
       .subscribe({
         next: (data) => {
-          this.router.navigate([this.returnUrl]);
+          this.loading = false;
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 500);
         },
         error: (error) => {
           this.loading = false;
@@ -83,15 +85,5 @@ export class LoginPage implements OnInit {
           }
         },
       });
-
-    // deprycated old method
-    // .subscribe(
-    //   (data) => {
-    //     this.router.navigate([this.returnUrl]);
-    //   },
-    //   (error) => {
-    //     this.loading = false;
-    //   }
-    // );
   }
 }
