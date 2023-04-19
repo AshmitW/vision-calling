@@ -1,8 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { UserService } from './services/user.service';
+import { register } from 'swiper/element/bundle';
+
+register();
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -18,12 +21,14 @@ export class AppComponent {
   public logoutPages = [{ title: 'Logout', func: 'logout()', icon: 'log-out' }];
   private isLogged: boolean;
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private router: Router) {
     this.isLogged = this.userService.tokenValue ? true : false;
+    if (!localStorage.getItem('welcomeCompleted')) {
+      this.router.navigateByUrl('/welcome');
+    }
   }
 
   logout() {
-    console.log('Logout func called');
     this.userService.logout();
   }
 }
