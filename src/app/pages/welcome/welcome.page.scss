@@ -24,20 +24,3 @@ p {
   line-height: 1.5;
   color: var(--ion-color-step-600, #60646b);
 }
-
-.swiper-pagination-bullet {
-  --bullet-background: #37469b;
-  // --swiper-pagination-color: "#fff",
-  // --swiper-navigation-color: "#fff",
-}
-
-.swiper-pagination-bullet-active {
-  width: 12px;
-  height: 12px;
-  --bullet-background: transparent;
-}
-
-// .swiper-pagination-bullet {
-//   --swiper-pagination-bullet-inactive-color: grey;
-//   background-color: #fff !important;
-// }
