@@ -1,6 +1,6 @@
 {
-	"appId": "io.ionic.starter",
-	"appName": "Vision Calling",
-	"webDir": "www",
-	"bundledWebRuntime": false
+  "appId": "com.ashmit.vision",
+  "appName": "Vision Calling",
+  "webDir": "www",
+  "bundledWebRuntime": false
 }
