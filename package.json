@@ -13,9 +13,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint",
-    "postinstall": "npm run build",
-    "start:prod": "node dist/index.js"
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
