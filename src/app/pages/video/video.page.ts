@@ -46,13 +46,6 @@ export class VideoPage implements OnInit {
   // Dynamically create a container in the form of a DIV element to play the local video track.
   localPlayerContainer = document.createElement('div');
   constructor() {
-    document
-      .getElementById('video-wrapper')
-      .appendChild(this.remotePlayerContainer);
-    document
-      .getElementById('video-wrapper')
-      .appendChild(this.localPlayerContainer);
-
     // Specify the ID of the DIV container. You can use the uid of the local user.
     //@ts-ignore
     this.localPlayerContainer.id = this.options.uid;
@@ -107,7 +100,14 @@ export class VideoPage implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    document
+      .getElementById('video-wrapper')
+      .appendChild(this.remotePlayerContainer);
+    document
+      .getElementById('video-wrapper')
+      .appendChild(this.localPlayerContainer);
+  }
 
   async join() {
     // Join a channel.

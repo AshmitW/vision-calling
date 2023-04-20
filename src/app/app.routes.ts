@@ -32,9 +32,10 @@ export const routes: Routes = [
     path: 'welcome',
     loadComponent: () =>
       import('./pages/welcome/welcome.page').then((m) => m.WelcomePage),
-  },  {
-    path: 'video',
-    loadComponent: () => import('./video/video.page').then( m => m.VideoPage)
   },
-
+  {
+    path: 'video',
+    loadComponent: () =>
+      import('./pages/video/video.page').then((m) => m.VideoPage),
+  },
 ];
