@@ -32,6 +32,7 @@
     "@capacitor/keyboard": "4.1.1",
     "@capacitor/status-bar": "4.1.1",
     "@ionic/angular": "^7.0.0",
+    "agora-rtc-sdk-ng": "^4.17.1",
     "ionicons": "^7.0.0",
     "rxjs": "~7.5.0",
     "swiper": "^9.2.3",

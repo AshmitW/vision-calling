@@ -11,7 +11,6 @@ export const routes: Routes = [
     path: 'home',
     loadComponent: () =>
       import('./pages/home/home.page').then((m) => m.HomePage),
-    canActivate: [AuthGuard],
   },
   {
     path: 'messages',
@@ -28,9 +27,10 @@ export const routes: Routes = [
     path: 'signup',
     loadComponent: () =>
       import('./pages/signup/signup.page').then((m) => m.SignupPage),
-  },  {
-    path: 'welcome',
-    loadComponent: () => import('./pages/welcome/welcome.page').then( m => m.WelcomePage)
   },
-
+  {
+    path: 'welcome',
+    loadComponent: () =>
+      import('./pages/welcome/welcome.page').then((m) => m.WelcomePage),
+  },
 ];
