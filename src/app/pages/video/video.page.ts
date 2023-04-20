@@ -101,12 +101,12 @@ export class VideoPage implements OnInit {
   }
 
   ngOnInit() {
-    // document
-    //   .getElementById('video-wrapper')
-    //   .appendChild(this.remotePlayerContainer);
-    // document
-    //   .getElementById('video-wrapper')
-    //   .appendChild(this.localPlayerContainer);
+    document
+      .getElementById('video-wrapper')
+      .appendChild(this.remotePlayerContainer);
+    document
+      .getElementById('video-wrapper')
+      .appendChild(this.localPlayerContainer);
   }
 
   async join() {
