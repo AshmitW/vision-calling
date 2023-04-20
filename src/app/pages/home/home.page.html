@@ -13,8 +13,9 @@
       <ion-title size="large">Home</ion-title>
     </ion-toolbar>
   </ion-header>
-  <div>
-    <ion-button (click)="join()" id="join">Join</ion-button>
-    <ion-button (click)="leave()" id="leave">Leave</ion-button>
-  </div>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="routeVideo()">
+      <ion-icon ios="checkmark-outline" md="checkmark-sharp'"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

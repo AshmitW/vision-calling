@@ -1,14 +1,18 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>video</ion-title>
+    <ion-title>Video</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">video</ion-title>
+      <ion-title size="large">Video</ion-title>
     </ion-toolbar>
   </ion-header>
+  <div>
+    <ion-button (click)="join()" id="join">Join</ion-button>
+    <ion-button (click)="leave()" id="leave">Leave</ion-button>
+  </div>
   <div id="video-wrapper" class="video-wrapper"></div>
 </ion-content>

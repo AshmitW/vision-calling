@@ -108,4 +108,53 @@ export class VideoPage implements OnInit {
   }
 
   ngOnInit() {}
+
+  async join() {
+    // Join a channel.
+    await this.agoraEngine.join(
+      this.options.appId,
+      this.options.channel,
+      this.options.token,
+      this.options.uid
+    );
+    // Create a local audio track from the audio sampled by a microphone.
+    this.channelParameters.localAudioTrack =
+      await AgoraRTC.createMicrophoneAudioTrack();
+    // Create a local video track from the video captured by a camera.
+    this.channelParameters.localVideoTrack =
+      await AgoraRTC.createCameraVideoTrack();
+    // Append the local video container to the page body.
+    document.body.append(this.localPlayerContainer);
+    // Publish the local audio and video tracks in the channel.
+    await this.agoraEngine.publish([
+      this.channelParameters.localAudioTrack,
+      this.channelParameters.localVideoTrack,
+    ]);
+    // Play the local video track.
+    this.channelParameters.localVideoTrack.play(this.localPlayerContainer);
+    console.log('publish success!');
+  }
+
+  async leave() {
+    // Destroy the local audio and video tracks.
+    this.channelParameters.localAudioTrack.close();
+    this.channelParameters.localVideoTrack.close();
+    // Remove the containers you created for the local video and remote video.
+    this.removeVideoDiv(this.remotePlayerContainer.id);
+    this.removeVideoDiv(this.localPlayerContainer.id);
+    // Leave the channel
+    await this.agoraEngine.leave();
+    console.log('You left the channel');
+    // Refresh the page for reuse
+    window.location.reload();
+  }
+
+  // Remove the video stream from the container.
+  removeVideoDiv(elementId) {
+    console.log('Removing ' + elementId + 'Div');
+    let Div = document.getElementById(elementId);
+    if (Div) {
+      Div.remove();
+    }
+  }
 }
