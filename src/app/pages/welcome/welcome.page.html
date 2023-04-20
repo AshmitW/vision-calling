@@ -25,6 +25,18 @@
     <swiper-slide>
       <img src="./assets/logo.png" />
       <h2>Ready?</h2>
+      <ion-item button color="primary" (click)="checkVideoPermissions()">
+        <ion-label>Check Video Permissions</ion-label>
+      </ion-item>
+      <ion-item button color="secondary" (click)="requestVideoPermissions()">
+        <ion-label>Request Video Permissions</ion-label>
+      </ion-item>
+      <ion-item button color="primary" (click)="checkMicPermissions()">
+        <ion-label>Check Mic Permissions</ion-label>
+      </ion-item>
+      <ion-item button color="secondary" (click)="requestMicPermissions()">
+        <ion-label>Request Mic Permissions</ion-label>
+      </ion-item>
       <ion-button (click)="welcomeCompleted()" expand="block" strong="true">
         let's go <ion-icon slot="end" name="arrow-forward"></ion-icon>
       </ion-button>

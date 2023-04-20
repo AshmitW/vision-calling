@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import AgoraRTC from 'agora-rtc-sdk-ng';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-home',
