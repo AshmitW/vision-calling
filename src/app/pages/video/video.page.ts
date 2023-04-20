@@ -21,7 +21,7 @@ export class VideoPage implements OnInit {
     token:
       '007eJxTYLC/ln340UJX/8eBDr8/q887I7EoQ21u3tGsw5MmNwk+aPJXYEgxtEyySLWwNDcyNjQxNTBNMrY0NzMwTDM0TU5MNUwyndjgkNIQyMiQy8zExMgAgSA+H0NZZnFmfp5ucmJOTmZeOgMDANyVIuw=',
     // Set the user ID.
-    uid: Math.random() * (254 - 1) + 1,
+    uid: Math.round(Math.random() * (999 - 1) + 1),
   };
 
   // Create an instance of the Agora Engine
