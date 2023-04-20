@@ -5,7 +5,8 @@ import { IonicModule, MenuController } from '@ionic/angular';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Router } from '@angular/router';
 import { Camera } from '@capacitor/camera';
-import { Microphone, AudioRecording } from '@mozartec/capacitor-microphone';
+import { Microphone } from '@mozartec/capacitor-microphone';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-welcome',
@@ -16,7 +17,15 @@ import { Microphone, AudioRecording } from '@mozartec/capacitor-microphone';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class WelcomePage implements OnInit {
-  constructor(public menuCtrl: MenuController, private router: Router) {}
+  videoPermissionStatus: string = 'notInitiated';
+  micPermissionStatus: string = 'notInitiated';
+  nativePlatform: boolean;
+
+  constructor(public menuCtrl: MenuController, private router: Router) {
+    if (Capacitor.isNativePlatform()) {
+      this.nativePlatform = true;
+    }
+  }
 
   ngOnInit() {}
 
@@ -26,7 +35,21 @@ export class WelcomePage implements OnInit {
 
   welcomeCompleted() {
     localStorage.setItem('welcomeCompleted', 'true');
-    this.router.navigateByUrl('/home');
+    this.router.navigate(['/home'], { replaceUrl: true });
+  }
+
+  lastSlide(e) {
+    this.askPerms();
+  }
+
+  askPerms() {
+    if (Capacitor.isNativePlatform()) {
+      this.requestVideoPermissions();
+    }
+  }
+
+  tryAgainPerms() {
+    this.askPerms();
   }
 
   async checkVideoPermissions() {
@@ -35,8 +58,17 @@ export class WelcomePage implements OnInit {
       console.log(
         'checkPermissionsResult: ' + JSON.stringify(checkPermissionsResult)
       );
+      console.log('3+ Check Vid success: ', checkPermissionsResult.camera);
+      if (checkPermissionsResult.camera == 'granted') {
+        this.videoPermissionStatus = 'granted';
+      } else {
+        this.videoPermissionStatus = 'denied';
+      }
+      this.requestMicPermissions();
     } catch (error) {
       console.error('checkPermissions Error: ' + JSON.stringify(error));
+      this.videoPermissionStatus = 'denied';
+      console.log('3+ Check Vid denied');
     }
   }
 
@@ -46,8 +78,12 @@ export class WelcomePage implements OnInit {
       console.log(
         'requestPermissionsResult: ' + JSON.stringify(requestPermissionsResult)
       );
+      console.log('3+ request Vid success: ', requestPermissionsResult.camera);
+      this.checkVideoPermissions();
     } catch (error) {
       console.error('requestPermissions Error: ' + JSON.stringify(error));
+      this.videoPermissionStatus = 'denied';
+      console.log('3+ request Vid denied');
     }
   }
 
@@ -57,8 +93,16 @@ export class WelcomePage implements OnInit {
       console.log(
         'checkPermissionsResult: ' + JSON.stringify(checkPermissionsResult)
       );
+      console.log('3+ Check Mic success: ', checkPermissionsResult.microphone);
+      if (checkPermissionsResult.microphone == 'granted') {
+        this.micPermissionStatus = 'granted';
+      } else {
+        this.micPermissionStatus = 'denied';
+      }
     } catch (error) {
       console.error('checkPermissions Error: ' + JSON.stringify(error));
+      this.micPermissionStatus = 'denied';
+      console.log('3+ Check Mic denied');
     }
   }
 
@@ -68,8 +112,15 @@ export class WelcomePage implements OnInit {
       console.log(
         'requestPermissionsResult: ' + JSON.stringify(requestPermissionsResult)
       );
+      console.log(
+        '3+ request Mic success: ',
+        requestPermissionsResult.microphone
+      );
+      this.checkMicPermissions();
     } catch (error) {
       console.error('requestPermissions Error: ' + JSON.stringify(error));
+      this.micPermissionStatus = 'denied';
+      console.log('3+ request Mic denied');
     }
   }
 }

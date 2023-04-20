@@ -5,13 +5,13 @@ import { IonicModule } from '@ionic/angular';
 import AgoraRTC from 'agora-rtc-sdk-ng';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.page.html',
-  styleUrls: ['./home.page.scss'],
+  selector: 'app-video',
+  templateUrl: './video.page.html',
+  styleUrls: ['./video.page.scss'],
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule],
 })
-export class HomePage implements OnInit {
+export class VideoPage implements OnInit {
   options = {
     // Pass your App ID here.
     appId: 'd19b8e8972314505b397601f15cae1b5',
@@ -21,7 +21,7 @@ export class HomePage implements OnInit {
     token:
       '007eJxTYLC/ln340UJX/8eBDr8/q887I7EoQ21u3tGsw5MmNwk+aPJXYEgxtEyySLWwNDcyNjQxNTBNMrY0NzMwTDM0TU5MNUwyndjgkNIQyMiQy8zExMgAgSA+H0NZZnFmfp5ucmJOTmZeOgMDANyVIuw=',
     // Set the user ID.
-    uid: 0,
+    uid: Math.random() * (10000 - 1) + 1,
   };
 
   // Create an instance of the Agora Engine
@@ -45,21 +45,29 @@ export class HomePage implements OnInit {
 
   // Dynamically create a container in the form of a DIV element to play the local video track.
   localPlayerContainer = document.createElement('div');
-
   constructor() {
+    document
+      .getElementById('video-wrapper')
+      .appendChild(this.remotePlayerContainer);
+    document
+      .getElementById('video-wrapper')
+      .appendChild(this.localPlayerContainer);
+
     // Specify the ID of the DIV container. You can use the uid of the local user.
     //@ts-ignore
     this.localPlayerContainer.id = this.options.uid;
     // Set the textContent property of the local video container to the local user id.
     this.localPlayerContainer.textContent = 'Local user ' + this.options.uid;
     // Set the local video container size.
-    this.localPlayerContainer.style.width = '640px';
-    this.localPlayerContainer.style.height = '480px';
-    this.localPlayerContainer.style.padding = '15px 5px 5px 5px';
+    // this.localPlayerContainer.style.width = '640px';
+    // this.localPlayerContainer.style.height = '480px';
+    // this.localPlayerContainer.style.padding = '15px 5px 5px 5px';
+    this.localPlayerContainer.classList.add('video-container');
     // Set the remote video container size.
-    this.remotePlayerContainer.style.width = '640px';
-    this.remotePlayerContainer.style.height = '480px';
-    this.remotePlayerContainer.style.padding = '15px 5px 5px 5px';
+    // this.remotePlayerContainer.style.width = '640px';
+    // this.remotePlayerContainer.style.height = '480px';
+    // this.remotePlayerContainer.style.padding = '15px 5px 5px 5px';
+    this.remotePlayerContainer.classList.add('video-container');
     // Listen for the "user-published" event to retrieve a AgoraRTCRemoteUser object.
     this.agoraEngine.on('user-published', async (user, mediaType) => {
       // Subscribe to the remote user when the SDK triggers the "user-published" event.
@@ -100,53 +108,4 @@ export class HomePage implements OnInit {
   }
 
   ngOnInit() {}
-
-  async join() {
-    // Join a channel.
-    await this.agoraEngine.join(
-      this.options.appId,
-      this.options.channel,
-      this.options.token,
-      this.options.uid
-    );
-    // Create a local audio track from the audio sampled by a microphone.
-    this.channelParameters.localAudioTrack =
-      await AgoraRTC.createMicrophoneAudioTrack();
-    // Create a local video track from the video captured by a camera.
-    this.channelParameters.localVideoTrack =
-      await AgoraRTC.createCameraVideoTrack();
-    // Append the local video container to the page body.
-    document.body.append(this.localPlayerContainer);
-    // Publish the local audio and video tracks in the channel.
-    await this.agoraEngine.publish([
-      this.channelParameters.localAudioTrack,
-      this.channelParameters.localVideoTrack,
-    ]);
-    // Play the local video track.
-    this.channelParameters.localVideoTrack.play(this.localPlayerContainer);
-    console.log('publish success!');
-  }
-
-  async leave() {
-    // Destroy the local audio and video tracks.
-    this.channelParameters.localAudioTrack.close();
-    this.channelParameters.localVideoTrack.close();
-    // Remove the containers you created for the local video and remote video.
-    this.removeVideoDiv(this.remotePlayerContainer.id);
-    this.removeVideoDiv(this.localPlayerContainer.id);
-    // Leave the channel
-    await this.agoraEngine.leave();
-    console.log('You left the channel');
-    // Refresh the page for reuse
-    window.location.reload();
-  }
-
-  // Remove the video stream from the container.
-  removeVideoDiv(elementId) {
-    console.log('Removing ' + elementId + 'Div');
-    let Div = document.getElementById(elementId);
-    if (Div) {
-      Div.remove();
-    }
-  }
 }

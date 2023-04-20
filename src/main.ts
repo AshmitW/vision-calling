@@ -11,6 +11,7 @@ import { JwtInterceptor } from './app/interceptors/jwt.interceptor';
 import { HttpClientModule } from '@angular/common/http';
 import { JwtHelperService, JWT_OPTIONS } from '@auth0/angular-jwt';
 import { AuthGuardService } from './app/services/auth-guard.service';
+import { Swiper } from 'swiper';
 
 if (environment.production) {
   enableProdMode();
@@ -23,6 +24,7 @@ bootstrapApplication(AppComponent, {
     { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
     JwtHelperService,
     AuthGuardService,
+    Swiper,
     importProvidersFrom(IonicModule.forRoot({}), HttpClientModule),
     provideRouter(routes),
   ],
