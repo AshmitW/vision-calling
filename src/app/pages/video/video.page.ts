@@ -52,14 +52,14 @@ export class VideoPage implements OnInit {
     // Set the textContent property of the local video container to the local user id.
     this.localPlayerContainer.textContent = 'Local user ' + this.options.uid;
     // Set the local video container size.
-    // this.localPlayerContainer.style.width = '640px';
-    // this.localPlayerContainer.style.height = '480px';
-    // this.localPlayerContainer.style.padding = '15px 5px 5px 5px';
+    this.localPlayerContainer.style.width = '640px';
+    this.localPlayerContainer.style.height = '480px';
+    this.localPlayerContainer.style.padding = '15px 5px 5px 5px';
     this.localPlayerContainer.classList.add('video-container');
     // Set the remote video container size.
-    // this.remotePlayerContainer.style.width = '640px';
-    // this.remotePlayerContainer.style.height = '480px';
-    // this.remotePlayerContainer.style.padding = '15px 5px 5px 5px';
+    this.remotePlayerContainer.style.width = '640px';
+    this.remotePlayerContainer.style.height = '480px';
+    this.remotePlayerContainer.style.padding = '15px 5px 5px 5px';
     this.remotePlayerContainer.classList.add('video-container');
     // Listen for the "user-published" event to retrieve a AgoraRTCRemoteUser object.
     this.agoraEngine.on('user-published', async (user, mediaType) => {
@@ -101,12 +101,12 @@ export class VideoPage implements OnInit {
   }
 
   ngOnInit() {
-    document
-      .getElementById('video-wrapper')
-      .appendChild(this.remotePlayerContainer);
-    document
-      .getElementById('video-wrapper')
-      .appendChild(this.localPlayerContainer);
+    // document
+    //   .getElementById('video-wrapper')
+    //   .appendChild(this.remotePlayerContainer);
+    // document
+    //   .getElementById('video-wrapper')
+    //   .appendChild(this.localPlayerContainer);
   }
 
   async join() {
