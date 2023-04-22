@@ -8,34 +8,20 @@
         </div>
       </div>
     </div>
-    <ng-container *ngIf="rtc.rtcDetails.client.remoteUsers.length <= 2">
-      <ng-container *ngFor="let user of rtc.rtcDetails.client.remoteUsers">
-        <div class="remote-2-video-container">
+    <div class="uk-child-width-1-1 vid-grid" uk-grid>
+      <div *ngFor="let user of rtc.rtcDetails.client.remoteUsers">
+        <div class="remote-video-container">
           <div
-            class="remote-2-video-player"
+            class="remote-video-player"
             [id]="'remote-user-player-'+ user.uid"
           >
-            <div class="remote-2-name-wrapper">
+            <div class="remote-name-wrapper">
               <span class="user-name">Remote name {{ user.uid }}</span>
             </div>
           </div>
         </div>
-      </ng-container>
-    </ng-container>
-    <ng-container *ngIf="rtc.rtcDetails.client.remoteUsers.length > 2">
-      <ng-container *ngFor="let user of rtc.rtcDetails.client.remoteUsers">
-        <div class="remote-multi-video-container">
-          <div
-            class="remote-multi-video-player"
-            [id]="'remote-user-player-'+ user.uid"
-          >
-            <div class="remote-multi-name-wrapper">
-              <span class="user-name">Remote name {{ user.uid }}</span>
-            </div>
-          </div>
-        </div>
-      </ng-container>
-    </ng-container>
+      </div>
+    </div>
   </div>
   <div id="controls">
     <ion-fab slot="fixed" vertical="bottom" horizontal="start">

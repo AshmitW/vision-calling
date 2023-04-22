@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, MenuController } from '@ionic/angular';
 import { RtcService } from 'src/app/services/rtc.service';
 import { Router } from '@angular/router';
 import interact from 'interactjs';
@@ -18,8 +18,16 @@ export class VideoPage implements OnInit {
   audioMuted: boolean;
   videoMuted: boolean;
 
-  constructor(public rtc: RtcService, private router: Router) {
+  constructor(
+    public menuCtrl: MenuController,
+    public rtc: RtcService,
+    private router: Router
+  ) {
     this.startCall();
+  }
+
+  ionViewWillEnter() {
+    this.menuCtrl.enable(false);
   }
 
   ngOnInit() {
