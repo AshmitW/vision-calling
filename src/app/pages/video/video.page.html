@@ -1,21 +1,35 @@
 <ion-content [fullscreen]="true">
   <div></div>
   <div id="video-wrapper" class="video-wrapper">
-    <ng-container *ngIf="rtc.rtcDetails.client.remoteUsers.length <= 2">
-      <div class="local-2video-container" draggable="true">
-        <div class="local-2video-player" id="local-player">
-          <div class="local-name2-wrapper">
-            <span class="user-name">My name {{ uid }}</span>
-          </div>
+    <div class="local-video-container draggable">
+      <div class="local-video-player" id="local-player">
+        <div class="local-name-wrapper">
+          <span class="user-name">My name {{ uid }}</span>
         </div>
       </div>
+    </div>
+    <ng-container *ngIf="rtc.rtcDetails.client.remoteUsers.length <= 2">
       <ng-container *ngFor="let user of rtc.rtcDetails.client.remoteUsers">
-        <div class="remote-2video-container">
+        <div class="remote-2-video-container">
           <div
-            class="remote-2video-player"
+            class="remote-2-video-player"
             [id]="'remote-user-player-'+ user.uid"
           >
-            <div class="remote-name2-wrapper">
+            <div class="remote-2-name-wrapper">
+              <span class="user-name">Remote name {{ user.uid }}</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+    <ng-container *ngIf="rtc.rtcDetails.client.remoteUsers.length > 2">
+      <ng-container *ngFor="let user of rtc.rtcDetails.client.remoteUsers">
+        <div class="remote-multi-video-container">
+          <div
+            class="remote-multi-video-player"
+            [id]="'remote-user-player-'+ user.uid"
+          >
+            <div class="remote-multi-name-wrapper">
               <span class="user-name">Remote name {{ user.uid }}</span>
             </div>
           </div>
