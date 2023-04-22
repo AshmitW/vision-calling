@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, MenuController } from '@ionic/angular';
 import { RtcService } from 'src/app/services/rtc.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import interact from 'interactjs';
 
 @Component({
@@ -17,11 +17,13 @@ export class VideoPage implements OnInit {
   uid;
   audioMuted: boolean;
   videoMuted: boolean;
+  visionCode: string = '';
 
   constructor(
     public menuCtrl: MenuController,
     public rtc: RtcService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.startCall();
   }
@@ -31,24 +33,24 @@ export class VideoPage implements OnInit {
   }
 
   ngOnInit() {
-    this.rtc.updateUserInfo.subscribe(async (id) => {
-      if (id) {
-        try {
-          // senderId means uid getUserInfo
-          console.log('user getUserInfo');
+    // this.rtc.updateUserInfo.subscribe(async (id) => {
+    //   if (id) {
+    //     try {
+    //       // senderId means uid getUserInfo
+    //       console.log('user getUserInfo');
 
-          for (let index = 0; index < this.rtc.remoteUsers.length; index++) {
-            const element = this.rtc.remoteUsers[index];
-            console.log(element, 'user getUserInfo remoteUsers');
-            if (element.uid == id) {
-              element.name = 'TEST USER';
-            }
-          }
-        } catch (error) {
-          console.log(error, 'error');
-        }
-      }
-    });
+    //       for (let index = 0; index < this.rtc.remoteUsers.length; index++) {
+    //         const element = this.rtc.remoteUsers[index];
+    //         console.log(element, 'user getUserInfo remoteUsers');
+    //         if (element.uid == id) {
+    //           element.name = 'TEST USER';
+    //         }
+    //       }
+    //     } catch (error) {
+    //       console.log(error, 'error');
+    //     }
+    //   }
+    // });
     this.makeFrameDraggable();
   }
 
@@ -81,10 +83,17 @@ export class VideoPage implements OnInit {
 
   async startCall() {
     try {
+      this.route.queryParams.subscribe((params) => {
+        this.visionCode = params['visionCode'];
+      });
+      if (!this.visionCode) {
+        this.router.navigate(['home']);
+        return;
+      }
       this.rtc.rtcDetails.client = this.rtc.createRTCClient();
       this.rtc.agoraServerEvents(this.rtc.rtcDetails);
       this.uid = this.rtc.options.uid;
-      await this.rtc.localUser('asb', 1, 'host', this.rtc.rtcDetails);
+      await this.rtc.joinCall(this.visionCode, 'asb', 1, this.rtc.rtcDetails);
     } catch (error) {
       console.log(error);
     }

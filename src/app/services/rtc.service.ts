@@ -28,10 +28,8 @@ export class RtcService {
     video: true,
   };
 
-  name;
   videoStatus = true;
   audioStatus = false;
-  errorValue;
   type;
 
   options = {
@@ -50,81 +48,31 @@ export class RtcService {
     return AgoraRTC.createClient({ mode: 'rtc', codec: 'h264' });
   }
 
-  // To join a call with tracks (video or audio)
-  async localUser(token: string, uuid: number, type: string, rtc: RtcInfo) {
-    console.log('4+ LOCALUSER');
+  // To Join call, create localtracks and publish it
+  async joinCall(channel: string, token: string, uuid: number, rtc: RtcInfo) {
     await rtc.client.join(
       this.options.appId,
       this.options.channel,
       this.options.token,
       this.options.uid
     );
-    // Create an audio track from the audio sampled by a microphone.
-    this.rtcDetails.localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack(
-      // Custom Audio Manipulation
-      {
-        encoderConfig: {
-          sampleRate: 48000,
-          stereo: true,
-          bitrate: 128,
-        },
-      }
-    );
-    // Create a video track from the video captured by a camera.
-    this.rtcDetails.localVideoTrack = await AgoraRTC.createCameraVideoTrack();
-
-    // if you want to use your camera
-    // this.switchCamera('OBS Virtual Camera', this.rtcDetails.localVideoTrack)
-
-    // Publish the local audio and video tracks to the channel.
-    // this.rtcDetails.localAudioTrack.play();
+    this.rtcDetails.localAudioTrack =
+      await AgoraRTC.createMicrophoneAudioTrack();
+    this.rtcDetails.localVideoTrack = await AgoraRTC.createCameraVideoTrack({
+      encoderConfig: '720p',
+    });
+    this.rtcDetails.localAudioTrack.play();
     this.rtcDetails.localVideoTrack.play('local-player');
-
-    // channel for other users to subscribe to it.
     await rtc.client.publish([
       this.rtcDetails.localAudioTrack,
       this.rtcDetails.localVideoTrack,
     ]);
   }
 
-  async getVideodevices() {
-    let cams = await AgoraRTC.getCameras(); //  all cameras devices you can use
-    return cams;
-  }
-
-  async allaudiodevices() {
-    let mics = await AgoraRTC.getMicrophones(); // all microphones devices you can use
-    return mics;
-  }
-
-  async switchCamera(label: string, localTracks: ICameraVideoTrack) {
-    const cams = await this.getVideodevices();
-    let currentCam = cams.find((cam) => cam.label === label);
-    await localTracks.setDevice(currentCam.deviceId);
-  }
-
-  // To switch audio-
-  async switchMicrophone(label: string, localTracks: IMicrophoneAudioTrack) {
-    const mics = await this.allaudiodevices();
-    let currentMic = mics.find((mic) => mic.label === label);
-    await localTracks.setDevice(currentMic.deviceId);
-  }
-
-  async switchMicrophone2(val, localTracks) {
-    let mics = await AgoraRTC.getDevices();
-    if (val.kind == 'audiooutput') {
-      let currentMic = mics.find((mic) => mic.label === val.label);
-      await localTracks.setPlaybackDevice(currentMic.deviceId);
-    } else {
-      let currentMic2 = mics.find((mic) => mic.label === val.label);
-      await localTracks.setDevice(currentMic2.deviceId);
-    }
-  }
-
+  // To subscribe to all events so we can get remote users and keep a long of all events
   agoraServerEvents(rtc: RtcInfo, uid1?: number, uid2?: number) {
-    // 2 used
     rtc.client.on('user-published', async (user, mediaType) => {
-      console.log(user, mediaType, 'user-published');
+      console.log('user-published', user, mediaType, '1+');
       await rtc.client.subscribe(user, mediaType);
       if (user.hasAudio) {
         user.audioTrack?.play();
@@ -132,116 +80,83 @@ export class RtcService {
       if (user.hasVideo) {
         user.videoTrack?.play(`remote-user-player-${user.uid}`);
       }
-      let id = user.uid;
     });
-
     rtc.client.on('user-unpublished', (user) => {
-      console.log(user, 'user-unpublished');
+      console.log('user-unpublished', user, '2+');
     });
     rtc.client.on('connection-state-change', (curState, prevState) => {
-      console.log('current', curState, 'prev', prevState, 'event');
+      console.log('current', curState, 'prev', prevState, '3+');
     });
-
-    // 1 used
     rtc.client.on('user-joined', (user) => {
-      let id = user.uid;
-      console.log('user-joined', user, this.remoteUsers, 'event1');
+      console.log('user-joined', user, this.remoteUsers, '4+');
     });
     rtc.client.on('channel-media-relay-event', (user) => {
-      console.log('channel-media-relay-event', user, 'event2');
+      console.log('channel-media-relay-event', user, '5+');
     });
     rtc.client.on('channel-media-relay-state', (user) => {
-      console.log('channel-media-relay-state', user, 'event4');
+      console.log('channel-media-relay-state', user, '6+');
     });
     rtc.client.on('user-left', (user) => {
-      console.log('user-left', user, 'event3');
+      console.log('user-left', user, '7+');
     });
-
     rtc.client.on('crypt-error', (user) => {
-      console.log('crypt-error', user, 'event5');
+      console.log('crypt-error', user, '8+');
     });
     rtc.client.on('exception', (user) => {
-      console.log('exception', user, 'event6');
+      console.log('exception', user, '9+');
     });
     rtc.client.on('live-streaming-error', (user) => {
-      console.log('live-streaming-error', user, 'event7');
+      console.log('live-streaming-error', user, '10+');
     });
     rtc.client.on('live-streaming-warning', (user) => {
-      console.log('live-streaming-warning', user, 'event8');
+      console.log('live-streaming-warning', user, '11+');
     });
     rtc.client.on('media-reconnect-end', (user) => {
-      console.log('media-reconnect-end', user, 'event9');
+      console.log('media-reconnect-end', user, '12+');
     });
     rtc.client.on('media-reconnect-start', (user) => {
-      console.log('media-reconnect-start', user, 'event10');
+      console.log('media-reconnect-start', user, '13+');
     });
     rtc.client.on('network-quality', (user) => {
-      // console.log("network-quality", user, 'event11');
+      console.log('network-quality', user, '14+');
     });
     rtc.client.on('stream-fallback', (user) => {
-      console.log('stream-fallback', user, 'event12');
+      console.log('stream-fallback', user, '15+');
     });
     rtc.client.on('stream-type-changed', (user) => {
-      console.log('stream-type-changed', user, 'event13');
+      console.log('stream-type-changed', user, '16+');
     });
     rtc.client.on('token-privilege-did-expire', (user) => {
-      console.log('token-privilege-did-expire', user, 'event14');
+      console.log('token-privilege-did-expire', user, '17+');
     });
     rtc.client.on('token-privilege-will-expire', (user) => {
-      console.log('token-privilege-will-expire', user, 'event15');
+      console.log('token-privilege-will-expire', user, '18+');
     });
     // rtc.client.enableAudioVolumeIndicator();
     rtc.client.on('volume-indicator', (user) => {
-      console.log('volume-indicator', user, 'volume');
+      console.log('volume-indicator', user, '19+');
     });
     rtc.client.on('track-ended', () => {
-      console.log('track-ended', 'event17');
+      console.log('track-ended', '20+');
     });
   }
 
-  // To leave channel-
+  // To end session, closing localtracks, destroying div and leaving channel
   async leaveCall(rtc: RtcInfo) {
-    // Destroy the local audio and video tracks.
     if (rtc.localAudioTrack != undefined) {
       rtc.localAudioTrack.close();
     }
     if (rtc.localVideoTrack != undefined) {
       rtc.localVideoTrack.close();
     }
-
-    // Traverse all remote users.
     if (rtc.client != undefined) {
       rtc.client.remoteUsers.forEach((user) => {
-        // Destroy the dynamically created DIV container.
         const playerContainer = document.getElementById(
           'remote-user-player' + user.uid
         );
         playerContainer && playerContainer.remove();
       });
-      // Leave the channel.
       await rtc.client.leave();
     }
-  }
-
-  async videoUpdate() {
-    // this.videoStatus = flag;
-
-    if (this.videoStatus) {
-      this.videoStatus = false;
-    } else {
-      this.videoStatus = true;
-    }
-    await this.rtcDetails.localVideoTrack.setEnabled(this.videoStatus);
-  }
-
-  async audioUpdate() {
-    // this.audioStatus = flag;
-
-    if (this.audioStatus) {
-      this.audioStatus = false;
-    } else {
-      this.audioStatus = true;
-    }
-    await this.rtcDetails.localAudioTrack.setEnabled(this.audioStatus);
   }
 }

@@ -12,11 +12,16 @@ import { Router } from '@angular/router';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class HomePage implements OnInit {
+  visionCode: string = '';
   constructor(private router: Router) {}
 
   ngOnInit() {}
 
   routeVideo() {
-    this.router.navigateByUrl('/video');
+    this.router.navigate(['video'], {
+      queryParams: {
+        visionCode: this.visionCode,
+      },
+    });
   }
 }
