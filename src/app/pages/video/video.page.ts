@@ -8,6 +8,7 @@ import interact from 'interactjs';
 import { UserService } from 'src/app/services/user.service';
 import { first } from 'rxjs';
 import { UserInfo } from 'src/app/models/user-info';
+import { AgoraToken } from 'src/app/models/agora-token';
 
 @Component({
   selector: 'app-video',
@@ -20,6 +21,7 @@ export class VideoPage implements OnInit {
   audioMuted: boolean;
   videoMuted: boolean;
   visionCode: string = '';
+  agoraRtcToken: AgoraToken;
   loading: boolean = true;
   currentUser: UserInfo;
 
@@ -38,24 +40,6 @@ export class VideoPage implements OnInit {
   }
 
   ngOnInit() {
-    // this.rtc.updateUserInfo.subscribe(async (id) => {
-    //   if (id) {
-    //     try {
-    //       // senderId means uid getUserInfo
-    //       console.log('user getUserInfo');
-
-    //       for (let index = 0; index < this.rtc.remoteUsers.length; index++) {
-    //         const element = this.rtc.remoteUsers[index];
-    //         console.log(element, 'user getUserInfo remoteUsers');
-    //         if (element.uid == id) {
-    //           element.name = 'TEST USER';
-    //         }
-    //       }
-    //     } catch (error) {
-    //       console.log(error, 'error');
-    //     }
-    //   }
-    // });
     this.makeFrameDraggable();
   }
 
@@ -69,16 +53,33 @@ export class VideoPage implements OnInit {
         .subscribe({
           next: (user: UserInfo) => {
             this.currentUser = user;
-            console.log('VISION', this.currentUser);
-            if (!this.visionCode || !this.currentUser) {
-              this.loading = false;
-              this.router.navigate(['home'], { replaceUrl: true });
-              return;
-            }
-            this.startCall();
+            this.userService
+              .getAgoraRtcToken(this.visionCode, this.currentUser.id)
+              .pipe(first())
+              .subscribe({
+                next: (agoraToken: AgoraToken) => {
+                  this.agoraRtcToken = agoraToken;
+                  // console.log('TOKEN 2', this.agoraRtcToken.agoraToken);
+                  if (
+                    !this.visionCode ||
+                    !this.currentUser ||
+                    !this.agoraRtcToken
+                  ) {
+                    this.loading = false;
+                    this.router.navigate(['home'], { replaceUrl: true });
+                    return;
+                  }
+                  this.startCall();
+                },
+                error: (error) => {
+                  this.loading = false;
+                  this.router.navigate(['home'], { replaceUrl: true });
+                },
+              });
           },
           error: (error) => {
             this.loading = false;
+            this.router.navigate(['home'], { replaceUrl: true });
           },
         });
     });
@@ -91,7 +92,7 @@ export class VideoPage implements OnInit {
       this.rtc.agoraServerEvents(this.rtc.rtcDetails);
       await this.rtc.joinCall(
         this.visionCode,
-        'asb',
+        this.agoraRtcToken.agoraToken,
         this.currentUser.id,
         this.rtc.rtcDetails
       );

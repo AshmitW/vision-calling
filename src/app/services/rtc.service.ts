@@ -1,18 +1,9 @@
 import { Injectable } from '@angular/core';
-import AgoraRTC, {
-  IAgoraRTCClient,
-  LiveStreamingTranscodingConfig,
-  ICameraVideoTrack,
-  IMicrophoneAudioTrack,
-  ScreenVideoTrackInitConfig,
-  VideoEncoderConfiguration,
-  AREAS,
-  IRemoteAudioTrack,
-  ClientRole,
-} from 'agora-rtc-sdk-ng';
+import AgoraRTC from 'agora-rtc-sdk-ng';
 import { RtcInfo } from '../models/rtc-info';
 import { RtcUserInfo } from '../models/rtc-user-info';
-import { BehaviorSubject } from 'rxjs';
+import { first } from 'rxjs';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -37,8 +28,8 @@ export class RtcService {
   };
 
   remoteUsers: RtcUserInfo[] = [];
-  updateUserInfo = new BehaviorSubject<any>(null);
-  constructor() {}
+  remoteUsersDB = [];
+  constructor(private userService: UserService) {}
 
   createRTCClient() {
     return AgoraRTC.createClient({ mode: 'rtc', codec: 'h264' });
@@ -46,7 +37,7 @@ export class RtcService {
 
   // To Join call, create localtracks and publish it
   async joinCall(channel: string, token: string, uid: string, rtc: RtcInfo) {
-    await rtc.client.join(this.options.appId, channel, this.options.token, uid);
+    await rtc.client.join(this.options.appId, channel, token, uid);
     this.rtcDetails.localAudioTrack =
       await AgoraRTC.createMicrophoneAudioTrack();
     this.rtcDetails.localVideoTrack = await AgoraRTC.createCameraVideoTrack({
@@ -65,6 +56,7 @@ export class RtcService {
     rtc.client.on('user-published', async (user, mediaType) => {
       console.log('user-published', user, mediaType, '1+');
       await rtc.client.subscribe(user, mediaType);
+      // console.log('USERUID', user.uid);
       if (user.hasAudio) {
         user.audioTrack?.play();
       }
@@ -80,6 +72,15 @@ export class RtcService {
     });
     rtc.client.on('user-joined', (user) => {
       console.log('user-joined', user, this.remoteUsers, '4+');
+      this.userService
+        .getUser(user.uid.toString())
+        .pipe(first())
+        .subscribe({
+          next: (userDB) => {
+            this.remoteUsersDB.push(userDB);
+          },
+          error: (error) => {},
+        });
     });
     rtc.client.on('channel-media-relay-event', (user) => {
       console.log('channel-media-relay-event', user, '5+');
@@ -89,6 +90,9 @@ export class RtcService {
     });
     rtc.client.on('user-left', (user) => {
       console.log('user-left', user, '7+');
+      this.remoteUsersDB = this.remoteUsersDB.filter(
+        (item) => item.id !== user.uid
+      );
     });
     rtc.client.on('crypt-error', (user) => {
       console.log('crypt-error', user, '8+');

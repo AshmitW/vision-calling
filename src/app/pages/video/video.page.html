@@ -14,9 +14,15 @@
             class="remote-video-player"
             [id]="'remote-user-player-'+ user.uid"
           >
-            <div class="remote-name-wrapper">
-              <span class="user-name">Remote name {{ user.uid }}</span>
-            </div>
+            <ng-container *ngFor="let userDB of rtc?.remoteUsersDB">
+              <ng-container *ngIf="userDB.id === user.uid">
+                <div class="remote-name-wrapper">
+                  <span class="user-name">
+                    {{ userDB?.username || "..." }}</span
+                  >
+                </div>
+              </ng-container>
+            </ng-container>
           </div>
         </div>
       </div>

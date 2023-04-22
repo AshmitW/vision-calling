@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { AgoraToken } from '../models/agora-token';
 
 @Injectable({
   providedIn: 'root',
@@ -90,6 +91,19 @@ export class UserService {
         return user;
       })
     );
+  }
+
+  getAgoraRtcToken(channelName: string, uid: string) {
+    return this.http
+      .post<AgoraToken>(`${environment.apiUrl}/agora/token`, {
+        channelName,
+        uid,
+      })
+      .pipe(
+        map((agoraToken) => {
+          return agoraToken;
+        })
+      );
   }
 
   logout() {
