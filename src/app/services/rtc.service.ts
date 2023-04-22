@@ -28,16 +28,12 @@ export class RtcService {
     video: true,
   };
 
-  videoStatus = true;
-  audioStatus = false;
-  type;
-
   options = {
     appId: 'd19b8e8972314505b397601f15cae1b5',
     channel: 'vision-calling',
     token:
       '007eJxTYFjSbWL2faF2/3Xld/M5u44/9b0kVz6P5/u+AtFVYdwni/kVGFIMLZMsUi0szY2MDU1MDUyTjC3NzQwM0wxNkxNTDZNMo62dUxoCGRm2PXBiZGSAQBCfj6EsszgzP083OTEnJzMvnYEBAH6NIn0=',
-    uid: Math.round(Math.random() * (999 - 1) + 1),
+    uid: Math.round(Math.random() * (999 - 1) + 1).toString(),
   };
 
   remoteUsers: RtcUserInfo[] = [];
@@ -49,13 +45,8 @@ export class RtcService {
   }
 
   // To Join call, create localtracks and publish it
-  async joinCall(channel: string, token: string, uuid: number, rtc: RtcInfo) {
-    await rtc.client.join(
-      this.options.appId,
-      this.options.channel,
-      this.options.token,
-      this.options.uid
-    );
+  async joinCall(channel: string, token: string, uid: string, rtc: RtcInfo) {
+    await rtc.client.join(this.options.appId, channel, this.options.token, uid);
     this.rtcDetails.localAudioTrack =
       await AgoraRTC.createMicrophoneAudioTrack();
     this.rtcDetails.localVideoTrack = await AgoraRTC.createCameraVideoTrack({

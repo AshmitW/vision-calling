@@ -48,13 +48,11 @@ export class SignupPage implements OnInit {
   }
 
   signUp() {
-    // stop here if values are invalid
     if (!this.username || !this.email || !this.password) {
       // console.log('Please fill in the email and password fields!');
       this.presentToast('Please fill in all the fields!');
       return;
     }
-
     this.loading = true;
     this.userService
       .signUp(this.username, this.email, this.password)
@@ -63,7 +61,7 @@ export class SignupPage implements OnInit {
         next: (data) => {
           this.loading = false;
           setTimeout(() => {
-            this.router.navigate(['/login']);
+            this.router.navigate(['/login'], { replaceUrl: true });
           }, 500);
         },
         error: (error) => {

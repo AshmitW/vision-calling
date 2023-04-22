@@ -5,6 +5,9 @@ import { IonicModule, MenuController } from '@ionic/angular';
 import { RtcService } from 'src/app/services/rtc.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import interact from 'interactjs';
+import { UserService } from 'src/app/services/user.service';
+import { first } from 'rxjs';
+import { UserInfo } from 'src/app/models/user-info';
 
 @Component({
   selector: 'app-video',
@@ -14,19 +17,20 @@ import interact from 'interactjs';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class VideoPage implements OnInit {
-  uid: number;
   audioMuted: boolean;
   videoMuted: boolean;
   visionCode: string = '';
   loading: boolean = true;
+  currentUser: UserInfo;
 
   constructor(
     public menuCtrl: MenuController,
     public rtc: RtcService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private userService: UserService
   ) {
-    this.startCall();
+    this.getAllInfo();
   }
 
   ionViewWillEnter() {
@@ -55,48 +59,42 @@ export class VideoPage implements OnInit {
     this.makeFrameDraggable();
   }
 
-  // Make the localVideoTrack Movable
-  makeFrameDraggable() {
-    interact('.draggable').draggable({
-      inertia: true,
-      modifiers: [
-        interact.modifiers.restrictRect({
-          restriction: 'parent',
-          endOnly: true,
-        }),
-      ],
-      autoScroll: true,
-
-      listeners: {
-        move: dragMoveListener,
-        end(event) {},
-      },
+  // Get visionCode (Channel ID) from query params and get CurrentUser Info
+  getAllInfo() {
+    this.route.queryParams.subscribe((params) => {
+      this.visionCode = params['visionCode'];
+      this.userService
+        .getCurrentUser()
+        .pipe(first())
+        .subscribe({
+          next: (user: UserInfo) => {
+            this.currentUser = user;
+            console.log('VISION', this.currentUser);
+            if (!this.visionCode || !this.currentUser) {
+              this.loading = false;
+              this.router.navigate(['home'], { replaceUrl: true });
+              return;
+            }
+            this.startCall();
+          },
+          error: (error) => {
+            this.loading = false;
+          },
+        });
     });
-
-    function dragMoveListener(event) {
-      var target = event.target;
-      var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-      var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-      target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-      target.setAttribute('data-x', x);
-      target.setAttribute('data-y', y);
-    }
   }
 
-  // Get visionCode (Channel ID) from query params and join call
+  // Create RTC client from RTC service, listen to all events and join call with the info received
   async startCall() {
     try {
-      this.route.queryParams.subscribe((params) => {
-        this.visionCode = params['visionCode'];
-      });
-      if (!this.visionCode) {
-        this.router.navigate(['home'], { replaceUrl: true });
-        return;
-      }
       this.rtc.rtcDetails.client = this.rtc.createRTCClient();
       this.rtc.agoraServerEvents(this.rtc.rtcDetails);
-      this.uid = this.rtc.options.uid;
-      await this.rtc.joinCall(this.visionCode, 'asb', 1, this.rtc.rtcDetails);
+      await this.rtc.joinCall(
+        this.visionCode,
+        'asb',
+        this.currentUser.id,
+        this.rtc.rtcDetails
+      );
       this.loading = false;
     } catch (error) {
       console.log(error);
@@ -133,5 +131,32 @@ export class VideoPage implements OnInit {
   async end() {
     await this.rtc.leaveCall(this.rtc.rtcDetails);
     this.router.navigate(['home'], { replaceUrl: true });
+  }
+
+  // Make the localVideoTrack Movable
+  makeFrameDraggable() {
+    interact('.draggable').draggable({
+      inertia: true,
+      modifiers: [
+        interact.modifiers.restrictRect({
+          restriction: 'parent',
+          endOnly: true,
+        }),
+      ],
+      autoScroll: true,
+      listeners: {
+        move: dragMoveListener,
+        end(event) {},
+      },
+    });
+
+    function dragMoveListener(event) {
+      var target = event.target;
+      var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+      var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+      target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+      target.setAttribute('data-x', x);
+      target.setAttribute('data-y', y);
+    }
   }
 }

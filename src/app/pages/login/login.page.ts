@@ -67,7 +67,9 @@ export class LoginPage implements OnInit {
       .subscribe({
         next: (data) => {
           this.loading = false;
-          this.router.navigate([this.returnUrl], { replaceUrl: true });
+          setTimeout(() => {
+            this.router.navigate([this.returnUrl], { replaceUrl: true });
+          }, 500);
         },
         error: (error) => {
           this.loading = false;
