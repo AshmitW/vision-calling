@@ -3,16 +3,16 @@
 // The list of file replacements can be found in `angular.json`.
 
 // Local
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:3000',
-};
-
-// Heroku
 // export const environment = {
 //   production: false,
-//   apiUrl: 'https://vision-calling.herokuapp.com',
+//   apiUrl: 'http://localhost:3000',
 // };
+
+// Heroku
+export const environment = {
+  production: false,
+  apiUrl: 'https://vision-calling.herokuapp.com',
+};
 
 /*
  * For easier debugging in development mode, you can import the following file

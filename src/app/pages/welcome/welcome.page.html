@@ -1,5 +1,9 @@
 <ion-content [fullscreen]="true">
-  <swiper-container [pagination]="true">
+  <swiper-container
+    class="swiper"
+    [pagination]="true"
+    (reachend)="lastSlide($event)"
+  >
     <swiper-slide>
       <img src="./assets/logo.png" />
       <h2>Welcome</h2>
@@ -23,11 +27,39 @@
     </swiper-slide>
 
     <swiper-slide>
+      <img src="./assets/perms.png" />
+      <h2>Permissions</h2>
+      <p>We will need some permissions to get the video working.</p>
+    </swiper-slide>
+
+    <swiper-slide>
       <img src="./assets/logo.png" />
       <h2>Ready?</h2>
-      <ion-button (click)="welcomeCompleted()" expand="block" strong="true">
-        let's go <ion-icon slot="end" name="arrow-forward"></ion-icon>
-      </ion-button>
+      <ng-container *ngIf="nativePlatform">
+        <p *ngIf="videoPermissionStatus === 'denied'">
+          Video Permission denied.
+        </p>
+        <p *ngIf="micPermissionStatus === 'denied'">Mic Permission denied.</p>
+        <ng-container
+          *ngIf="videoPermissionStatus === 'denied' || micPermissionStatus === 'denied'"
+        >
+          <ion-button (click)="tryAgainPerms()" expand="block" strong="true">
+            Try again
+          </ion-button>
+        </ng-container>
+        <ng-container
+          *ngIf="videoPermissionStatus === 'granted' && micPermissionStatus === 'granted'"
+        >
+          <ion-button (click)="welcomeCompleted()" expand="block" strong="true">
+            let's go <ion-icon slot="end" name="arrow-forward"></ion-icon>
+          </ion-button>
+        </ng-container>
+      </ng-container>
+      <ng-container *ngIf="!nativePlatform">
+        <ion-button (click)="welcomeCompleted()" expand="block" strong="true">
+          let's go <ion-icon slot="end" name="arrow-forward"></ion-icon>
+        </ion-button>
+      </ng-container>
     </swiper-slide>
   </swiper-container>
 </ion-content>

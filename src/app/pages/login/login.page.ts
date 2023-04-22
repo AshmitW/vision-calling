@@ -55,13 +55,11 @@ export class LoginPage implements OnInit {
   }
 
   login() {
-    // stop here if values are invalid
     if (!this.email || !this.password) {
       // console.log('Please fill in the email and password fields!');
       this.presentToast('Please fill in the email and password fields!');
       return;
     }
-
     this.loading = true;
     this.userService
       .login(this.email, this.password)
@@ -69,7 +67,9 @@ export class LoginPage implements OnInit {
       .subscribe({
         next: (data) => {
           this.loading = false;
-          this.router.navigate([this.returnUrl]);
+          setTimeout(() => {
+            this.router.navigate([this.returnUrl], { replaceUrl: true });
+          }, 500);
         },
         error: (error) => {
           this.loading = false;

@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { AgoraToken } from '../models/agora-token';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +14,6 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 export class UserService {
   private tokenSubject: BehaviorSubject<UserToken>;
   public token: Observable<UserToken>;
-  errorMessage: any;
 
   constructor(
     private router: Router,
@@ -34,8 +34,7 @@ export class UserService {
     if (localStorage.getItem('user-token')) {
       const token = JSON.parse(localStorage.getItem('user-token')).token;
       // console.log(token);
-      // Check whether the token is expired and return
-      // true or false
+      // Check whether the token is expired and return true or false
       return !this.jwtHelper.isTokenExpired(token);
     } else {
       return false;
@@ -87,11 +86,24 @@ export class UserService {
   }
 
   getCurrentUser() {
-    return this.http.get<UserInfo>(`${environment.apiUrl}/users`).pipe(
-      map((user) => {
+    return this.http.get<UserInfo>(`${environment.apiUrl}/whoAmI`).pipe(
+      map((user: UserInfo) => {
         return user;
       })
     );
+  }
+
+  getAgoraRtcToken(channelName: string, uid: string) {
+    return this.http
+      .post<AgoraToken>(`${environment.apiUrl}/agora/token`, {
+        channelName,
+        uid,
+      })
+      .pipe(
+        map((agoraToken) => {
+          return agoraToken;
+        })
+      );
   }
 
   logout() {
