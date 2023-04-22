@@ -14,10 +14,11 @@ import interact from 'interactjs';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class VideoPage implements OnInit {
-  uid;
+  uid: number;
   audioMuted: boolean;
   videoMuted: boolean;
   visionCode: string = '';
+  loading: boolean = true;
 
   constructor(
     public menuCtrl: MenuController,
@@ -54,6 +55,7 @@ export class VideoPage implements OnInit {
     this.makeFrameDraggable();
   }
 
+  // Make the localVideoTrack Movable
   makeFrameDraggable() {
     interact('.draggable').draggable({
       inertia: true,
@@ -81,52 +83,55 @@ export class VideoPage implements OnInit {
     }
   }
 
+  // Get visionCode (Channel ID) from query params and join call
   async startCall() {
     try {
       this.route.queryParams.subscribe((params) => {
         this.visionCode = params['visionCode'];
       });
       if (!this.visionCode) {
-        this.router.navigate(['home']);
+        this.router.navigate(['home'], { replaceUrl: true });
         return;
       }
       this.rtc.rtcDetails.client = this.rtc.createRTCClient();
       this.rtc.agoraServerEvents(this.rtc.rtcDetails);
       this.uid = this.rtc.options.uid;
       await this.rtc.joinCall(this.visionCode, 'asb', 1, this.rtc.rtcDetails);
+      this.loading = false;
     } catch (error) {
       console.log(error);
     }
   }
 
-  // To mute the audio
+  // Mute the audio
   async audioMute() {
     this.rtc.rtcDetails.localAudioTrack.setEnabled(false);
     this.rtc.rtcDetails.audio = false;
     this.audioMuted = true;
   }
 
-  // To unmute the audio
+  // Unmute the audio
   audioUnmute() {
     this.rtc.rtcDetails.localAudioTrack.setEnabled(true);
     this.rtc.rtcDetails.audio = true;
     this.audioMuted = false;
   }
 
-  // To mute the video
+  // Mute the video
   async videoMute() {
     this.rtc.rtcDetails.localVideoTrack.setEnabled(false);
     this.videoMuted = true;
   }
 
-  // To unmute the video
+  // Unmute the video
   videoUnmute() {
     this.rtc.rtcDetails.localVideoTrack.setEnabled(true);
     this.videoMuted = false;
   }
 
+  // Leave call and remove current page from history stack
   async end() {
     await this.rtc.leaveCall(this.rtc.rtcDetails);
-    this.router.navigate(['home']);
+    this.router.navigate(['home'], { replaceUrl: true });
   }
 }

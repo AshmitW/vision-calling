@@ -1,5 +1,4 @@
 <ion-content [fullscreen]="true">
-  <div></div>
   <div id="video-wrapper" class="video-wrapper">
     <div class="local-video-container draggable">
       <div class="local-video-player" id="local-player">
@@ -59,4 +58,5 @@
       </ion-fab-button>
     </ion-fab>
   </div>
+  <ion-loading [isOpen]="loading" message="Loading"></ion-loading>
 </ion-content>

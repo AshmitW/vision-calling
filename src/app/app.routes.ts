@@ -8,17 +8,6 @@ export const routes: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'home',
-    loadComponent: () =>
-      import('./pages/home/home.page').then((m) => m.HomePage),
-  },
-  {
-    path: 'messages',
-    loadComponent: () =>
-      import('./pages/messages/messages.page').then((m) => m.MessagesPage),
-    canActivate: [AuthGuard],
-  },
-  {
     path: 'login',
     loadComponent: () =>
       import('./pages/login/login.page').then((m) => m.LoginPage),
@@ -34,8 +23,22 @@ export const routes: Routes = [
       import('./pages/welcome/welcome.page').then((m) => m.WelcomePage),
   },
   {
+    path: 'home',
+    loadComponent: () =>
+      import('./pages/home/home.page').then((m) => m.HomePage),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'messages',
+    loadComponent: () =>
+      import('./pages/messages/messages.page').then((m) => m.MessagesPage),
+    canActivate: [AuthGuard],
+  },
+
+  {
     path: 'video',
     loadComponent: () =>
       import('./pages/video/video.page').then((m) => m.VideoPage),
+    canActivate: [AuthGuard],
   },
 ];

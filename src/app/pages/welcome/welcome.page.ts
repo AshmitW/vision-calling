@@ -35,7 +35,7 @@ export class WelcomePage implements OnInit {
 
   welcomeCompleted() {
     localStorage.setItem('welcomeCompleted', 'true');
-    this.router.navigate(['/home'], { replaceUrl: true });
+    this.router.navigate(['/login'], { replaceUrl: true });
   }
 
   lastSlide(e) {
