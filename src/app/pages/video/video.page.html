@@ -1,18 +1,62 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Video</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Video</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <div>
-    <ion-button (click)="join()" id="join">Join</ion-button>
-    <ion-button (click)="leave()" id="leave">Leave</ion-button>
+  <div></div>
+  <div id="video-wrapper" class="video-wrapper">
+    <ng-container *ngIf="rtc.rtcDetails.client.remoteUsers.length <= 2">
+      <div class="local-2video-container" draggable="true">
+        <div class="local-2video-player" id="local-player">
+          <div class="local-name2-wrapper">
+            <span class="user-name">My name {{ uid }}</span>
+          </div>
+        </div>
+      </div>
+      <ng-container *ngFor="let user of rtc.rtcDetails.client.remoteUsers">
+        <div class="remote-2video-container">
+          <div
+            class="remote-2video-player"
+            [id]="'remote-user-player-'+ user.uid"
+          >
+            <div class="remote-name2-wrapper">
+              <span class="user-name">Remote name {{ user.uid }}</span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
   </div>
-  <div id="video-wrapper" class="video-wrapper"></div>
+  <div id="controls">
+    <ion-fab slot="fixed" vertical="bottom" horizontal="start">
+      <ion-fab-button>
+        <ion-icon name="grid"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-list side="top">
+        <ng-container *ngIf="!videoMuted">
+          <ion-fab-button (click)="videoMute()">
+            <ion-icon name="videocam"></ion-icon>
+          </ion-fab-button>
+        </ng-container>
+        <ng-container *ngIf="videoMuted">
+          <ion-fab-button (click)="videoUnmute()">
+            <ion-icon name="videocam-off"></ion-icon>
+          </ion-fab-button>
+        </ng-container>
+      </ion-fab-list>
+      <ion-fab-list side="end">
+        <ng-container *ngIf="!audioMuted">
+          <ion-fab-button (click)="audioMute()">
+            <ion-icon name="mic"></ion-icon>
+          </ion-fab-button>
+        </ng-container>
+        <ng-container *ngIf="audioMuted">
+          <ion-fab-button (click)="audioUnmute()">
+            <ion-icon name="mic-off"></ion-icon>
+          </ion-fab-button>
+        </ng-container>
+      </ion-fab-list>
+    </ion-fab>
+    <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+      <ion-fab-button (click)="end()">
+        <ion-icon name="close"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  </div>
 </ion-content>

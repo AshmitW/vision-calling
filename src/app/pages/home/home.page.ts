@@ -17,7 +17,6 @@ export class HomePage implements OnInit {
   ngOnInit() {}
 
   routeVideo() {
-    console.log('test');
     this.router.navigateByUrl('/video');
   }
 }
