@@ -26,10 +26,12 @@ export class UserService {
     this.token = this.tokenSubject.asObservable();
   }
 
+  // Get the JWT
   public get tokenValue(): UserToken {
     return this.tokenSubject.value;
   }
 
+  // To check if authenticated with the JWT
   public isAuthenticated(): boolean {
     if (localStorage.getItem('user-token')) {
       const token = JSON.parse(localStorage.getItem('user-token')).token;
@@ -41,6 +43,7 @@ export class UserService {
     }
   }
 
+  // Login endpoint
   login(email: string, password: string) {
     return this.http
       .post<UserToken>(`${environment.apiUrl}/users/login`, {
@@ -59,6 +62,7 @@ export class UserService {
       );
   }
 
+  // Signup endpoint
   signUp(username: string, email: string, password: string) {
     return this.http
       .post<UserInfo>(`${environment.apiUrl}/signup`, {
@@ -73,6 +77,7 @@ export class UserService {
       );
   }
 
+  // Get user from ID with this endpoint
   getUser(id: string) {
     return this.http
       .post<UserInfo>(`${environment.apiUrl}/users`, {
@@ -85,6 +90,7 @@ export class UserService {
       );
   }
 
+  // Get current user from ID inside JWT with this endpoint
   getCurrentUser() {
     return this.http.get<UserInfo>(`${environment.apiUrl}/whoAmI`).pipe(
       map((user: UserInfo) => {
@@ -93,6 +99,7 @@ export class UserService {
     );
   }
 
+  // Get RTC token with this endpoint
   getAgoraRtcToken(channelName: string, uid: string) {
     return this.http
       .post<AgoraToken>(`${environment.apiUrl}/agora/token`, {
@@ -106,6 +113,7 @@ export class UserService {
       );
   }
 
+  // Logout from where we remove the JWT
   logout() {
     localStorage.removeItem('user-token');
     this.tokenSubject.next(null);

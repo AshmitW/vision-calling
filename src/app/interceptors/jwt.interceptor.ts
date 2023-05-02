@@ -13,6 +13,7 @@ import { environment } from 'src/environments/environment';
 export class JwtInterceptor implements HttpInterceptor {
   constructor(private userService: UserService) {}
 
+  // intercepter to intercept all requests
   intercept(
     request: HttpRequest<unknown>,
     next: HttpHandler

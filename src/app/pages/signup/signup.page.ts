@@ -28,6 +28,7 @@ export class SignupPage implements OnInit {
 
   ngOnInit() {}
 
+  // Turn off the sidemenu
   ionViewWillEnter() {
     this.loading = false;
     this.menuCtrl.enable(false);
@@ -37,6 +38,7 @@ export class SignupPage implements OnInit {
     this.loading = false;
   }
 
+  // Toast template
   async presentToast(message) {
     const toast = await this.toastController.create({
       message: message,
@@ -47,9 +49,10 @@ export class SignupPage implements OnInit {
     await toast.present();
   }
 
+  // Sign up endpoint
   signUp() {
+    // If username, email and password are not correct then start the project
     if (!this.username || !this.email || !this.password) {
-      // console.log('Please fill in the email and password fields!');
       this.presentToast('Please fill in all the fields!');
       return;
     }
@@ -60,25 +63,24 @@ export class SignupPage implements OnInit {
       .subscribe({
         next: (data) => {
           this.loading = false;
+          // set a short and small timer of 500 miliseconds to allow the loading bar to turn off before changing routes
           setTimeout(() => {
             this.router.navigate(['/login'], { replaceUrl: true });
           }, 500);
         },
         error: (error) => {
           this.loading = false;
+          // Showing different errors based on code
           if (error.error.error.code === 'VALIDATION_FAILED') {
             if (error.error.error.details[0].code === 'format') {
-              // console.log('EMAIL INCORRECT FORMAT');
               this.presentToast('The format for email is incorrect!');
             }
             if (error.error.error.details[0].code === 'minLength') {
-              // console.log('PASSWORD minimum 8 characters');
               this.presentToast(
                 'Password should be minimum 8 characters long!'
               );
             }
           } else {
-            // console.log(error.error.error.message);
             this.presentToast(error.error.error.message);
           }
         },

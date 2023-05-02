@@ -19,6 +19,7 @@ export class RtcService {
     video: true,
   };
 
+  // Token, channel and ID are not being used here and is rather recieved from Server or User
   options = {
     appId: 'd19b8e8972314505b397601f15cae1b5',
     channel: 'vision-calling',
@@ -27,10 +28,13 @@ export class RtcService {
     uid: Math.round(Math.random() * (999 - 1) + 1).toString(),
   };
 
+  // RemoteUsers where we store our remoteUsers video and audio feed
   remoteUsers: RtcUserInfo[] = [];
+  // Remote users where we store the info received from our DB for diplay names
   remoteUsersDB = [];
   constructor(private userService: UserService) {}
 
+  // Creating the RTC Client
   createRTCClient() {
     return AgoraRTC.createClient({ mode: 'rtc', codec: 'h264' });
   }
@@ -54,12 +58,14 @@ export class RtcService {
   // To subscribe to all events so we can get remote users and keep a long of all events
   agoraServerEvents(rtc: RtcInfo, uid1?: number, uid2?: number) {
     rtc.client.on('user-published', async (user, mediaType) => {
+      // All console logs below this, output with an extra code at the end to make it easier to pinpoint origin of console
       console.log('user-published', user, mediaType, '1+');
       await rtc.client.subscribe(user, mediaType);
-      // console.log('USERUID', user.uid);
+      // If incoming user has audio feed, play it
       if (user.hasAudio) {
         user.audioTrack?.play();
       }
+      // If incoming user has video feed, play it
       if (user.hasVideo) {
         user.videoTrack?.play(`remote-user-player-${user.uid}`);
       }
@@ -72,6 +78,7 @@ export class RtcService {
     });
     rtc.client.on('user-joined', (user) => {
       console.log('user-joined', user, this.remoteUsers, '4+');
+      // When a new user joins, we use thier ID to get their username and add to our remoteUsers.
       this.userService
         .getUser(user.uid.toString())
         .pipe(first())
@@ -90,6 +97,7 @@ export class RtcService {
     });
     rtc.client.on('user-left', (user) => {
       console.log('user-left', user, '7+');
+      // When a user leaves, we use thier ID to remove from ourremoteUsers.
       this.remoteUsersDB = this.remoteUsersDB.filter(
         (item) => item.id !== user.uid
       );
@@ -138,6 +146,7 @@ export class RtcService {
 
   // To end session, closing localtracks, destroying div and leaving channel
   async leaveCall(rtc: RtcInfo) {
+    // we empty our remoteUsers from DB
     this.remoteUsersDB = [];
     if (rtc.localAudioTrack != undefined) {
       rtc.localAudioTrack.close();

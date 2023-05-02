@@ -22,12 +22,15 @@ export class AppComponent {
   private isLogged: boolean;
 
   constructor(private userService: UserService, private router: Router) {
+    // isLogged is use to check if USER has logged in.
     this.isLogged = this.userService.tokenValue ? true : false;
+    // Check if User has done the first time setup, if not show it
     if (!localStorage.getItem('welcomeCompleted')) {
       this.router.navigateByUrl('/welcome');
     }
   }
 
+  // Calling the logout function in serice
   logout() {
     this.userService.logout();
   }

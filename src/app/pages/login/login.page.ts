@@ -28,9 +28,11 @@ export class LoginPage implements OnInit {
   ) {}
 
   ngOnInit() {
+    // getting the current or returned URL
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
+  // Turn off the sidemenu
   ionViewWillEnter() {
     this.loading = false;
     this.menuCtrl.enable(false);
@@ -40,6 +42,7 @@ export class LoginPage implements OnInit {
     this.loading = false;
   }
 
+  // Toast template
   async presentToast(message) {
     const toast = await this.toastController.create({
       message: message,
@@ -54,9 +57,10 @@ export class LoginPage implements OnInit {
     this.router.navigate(['/signup']);
   }
 
+  // login endpoint
   login() {
+    // Stop if email or password is incorrect
     if (!this.email || !this.password) {
-      // console.log('Please fill in the email and password fields!');
       this.presentToast('Please fill in the email and password fields!');
       return;
     }
@@ -67,25 +71,24 @@ export class LoginPage implements OnInit {
       .subscribe({
         next: (data) => {
           this.loading = false;
+          // set a short and small timer of 500 miliseconds to allow the loading bar to turn off before changing routes
           setTimeout(() => {
             this.router.navigate([this.returnUrl], { replaceUrl: true });
           }, 500);
         },
         error: (error) => {
           this.loading = false;
+          // Showing different errors based on code
           if (error.error.error.code === 'VALIDATION_FAILED') {
             if (error.error.error.details[0].code === 'format') {
-              // console.log('EMAIL INCORRECT FORMAT');
               this.presentToast('The format for email is incorrect!');
             }
             if (error.error.error.details[0].code === 'minLength') {
-              // console.log('PASSWORD minimum 8 characters');
               this.presentToast(
                 'Password should be minimum 8 characters long!'
               );
             }
           } else {
-            // console.log(error.error.error.message);
             this.presentToast(error.error.error.message);
           }
         },

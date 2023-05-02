@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { Camera } from '@capacitor/camera';
 import { Microphone } from '@mozartec/capacitor-microphone';
 import { Capacitor } from '@capacitor/core';
+import { platform } from 'process';
 
 @Component({
   selector: 'app-welcome',
@@ -22,6 +23,7 @@ export class WelcomePage implements OnInit {
   nativePlatform: boolean;
 
   constructor(public menuCtrl: MenuController, private router: Router) {
+    // Only show when native platform is being used
     if (Capacitor.isNativePlatform()) {
       this.nativePlatform = true;
     }
@@ -29,29 +31,35 @@ export class WelcomePage implements OnInit {
 
   ngOnInit() {}
 
+  // enabling sidemenu after turning it off and on
   ionViewWillEnter() {
     this.menuCtrl.enable(false);
   }
 
+  // User has completed welcome setup
   welcomeCompleted() {
     localStorage.setItem('welcomeCompleted', 'true');
     this.router.navigate(['/login'], { replaceUrl: true });
   }
 
+  // Triggered when last slide is called
   lastSlide(e) {
     this.askPerms();
   }
 
+  // Ask permission during setup
   askPerms() {
     if (Capacitor.isNativePlatform()) {
       this.requestVideoPermissions();
     }
   }
 
+  // Ask perms ahain if they say no
   tryAgainPerms() {
     this.askPerms();
   }
 
+  // Check if video permission is granted
   async checkVideoPermissions() {
     try {
       const checkPermissionsResult = await Camera.checkPermissions();
@@ -72,6 +80,7 @@ export class WelcomePage implements OnInit {
     }
   }
 
+  // Ask video permission
   async requestVideoPermissions() {
     try {
       const requestPermissionsResult = await Camera.requestPermissions();
@@ -87,6 +96,7 @@ export class WelcomePage implements OnInit {
     }
   }
 
+  // Check if Mic permission is granted
   async checkMicPermissions() {
     try {
       const checkPermissionsResult = await Microphone.checkPermissions();
@@ -106,6 +116,7 @@ export class WelcomePage implements OnInit {
     }
   }
 
+  // Ask Mic permission
   async requestMicPermissions() {
     try {
       const requestPermissionsResult = await Microphone.requestPermissions();
