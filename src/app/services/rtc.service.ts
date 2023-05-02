@@ -138,6 +138,7 @@ export class RtcService {
 
   // To end session, closing localtracks, destroying div and leaving channel
   async leaveCall(rtc: RtcInfo) {
+    this.remoteUsersDB = [];
     if (rtc.localAudioTrack != undefined) {
       rtc.localAudioTrack.close();
     }
