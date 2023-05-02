@@ -19,7 +19,7 @@ def capacitor_pods
   pod 'MozartecCapacitorMicrophone', :path => '../../node_modules/@mozartec/capacitor-microphone'
 end
 
-target 'App' do
+target 'Vision Calling' do
   capacitor_pods
   # Add your Pods here
 end
