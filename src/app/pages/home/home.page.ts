@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, MenuController } from '@ionic/angular';
 import { Router } from '@angular/router';
 
 @Component({
@@ -13,9 +13,14 @@ import { Router } from '@angular/router';
 })
 export class HomePage implements OnInit {
   visionCode: string = '';
-  constructor(private router: Router) {}
+  constructor(public menuCtrl: MenuController, private router: Router) {}
 
   ngOnInit() {}
+
+  ionViewWillEnter() {
+    // re-enable sidemenu after turning it off on login and sign up page
+    this.menuCtrl.enable(true);
+  }
 
   routeVideo() {
     this.router.navigate(['video'], {
