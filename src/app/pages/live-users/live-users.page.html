@@ -1,0 +1,44 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Live Users</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button></ion-back-button>
+      </ion-buttons>
+      <ion-title size="large">Live Users</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-refresher slot="fixed" (ionRefresh)="refreshUsers($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-searchbar
+    animated="true"
+    placeholder="Search users"
+    inputmode="search"
+    [(ngModel)]="keyword"
+    (ionChange)="getLiveUsers()"
+  ></ion-searchbar>
+  <ion-list>
+    <ion-item
+      *ngFor="let user of users; let index"
+      (click)="joinLiveStream(user._id)"
+    >
+      <ion-avatar slot="start">
+        <ion-icon name="person-circle" size="large"></ion-icon>
+      </ion-avatar>
+      <ion-label>{{ user.name }}</ion-label>
+      <ion-badge color="danger" slot="end">LIVE</ion-badge>
+    </ion-item>
+  </ion-list>
+  <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

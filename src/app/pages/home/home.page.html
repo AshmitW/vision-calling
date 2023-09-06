@@ -4,6 +4,14 @@
       <ion-menu-button auto-hide="false"></ion-menu-button>
     </ion-buttons>
     <ion-title>Home</ion-title>
+    <ion-buttons slot="end">
+      <ion-icon
+        (click)="routeMessages()"
+        size="large"
+        color="danger"
+        name="chatbox-ellipses"
+      ></ion-icon>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -15,21 +23,38 @@
   </ion-header>
   <div class="input-group">
     <ion-list>
-      <ion-item>
+      <ion-item style="--border-style: none">
         <ion-input
-          label="Code"
+          label="Vision Code"
           labelPlacement="floating"
-          helperText="Please enter the same code as your friends"
+          helperText="Please enter the same code as the user you wanna connect with"
           [(ngModel)]="visionCode"
           [counter]="true"
+          (ionInput)="setVisionCode($event)"
           maxlength="20"
         ></ion-input>
       </ion-item>
     </ion-list>
+    <br />
+    <ion-button expand="block" (click)="routeVideo()">
+      <ion-icon slot="start" name="call"></ion-icon>
+      Enter Call
+    </ion-button>
   </div>
-  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-    <ion-fab-button (click)="routeVideo()">
-      <ion-icon name="call"></ion-icon>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="start">
+    <ion-fab-button (click)="routeInvite()">
+      <ion-icon name="person-add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button id="open-live-stream-action-sheet">
+      <ion-icon name="ellipsis-vertical"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  <ion-action-sheet
+    trigger="open-live-stream-action-sheet"
+    header="Live Streaming"
+    [buttons]="actionSheetButtons"
+    (didDismiss)="checkLiveStreamAction($event)"
+  ></ion-action-sheet>
 </ion-content>

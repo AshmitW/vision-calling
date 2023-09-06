@@ -54,7 +54,7 @@ export class VideoPage implements OnInit {
           next: (user: UserInfo) => {
             this.currentUser = user;
             this.userService
-              .getAgoraRtcToken(this.visionCode, this.currentUser.id)
+              .getAgoraRtcToken(this.visionCode, this.currentUser._id)
               .pipe(first())
               .subscribe({
                 next: (agoraToken: AgoraToken) => {
@@ -66,20 +66,26 @@ export class VideoPage implements OnInit {
                     !this.agoraRtcToken
                   ) {
                     this.loading = false;
-                    this.router.navigate(['home'], { replaceUrl: true });
+                    setTimeout(() => {
+                      this.router.navigate(['home'], { replaceUrl: true });
+                    }, 500);
                     return;
                   }
                   this.startCall();
                 },
                 error: (error) => {
                   this.loading = false;
-                  this.router.navigate(['home'], { replaceUrl: true });
+                  setTimeout(() => {
+                    this.router.navigate(['home'], { replaceUrl: true });
+                  }, 500);
                 },
               });
           },
           error: (error) => {
             this.loading = false;
-            this.router.navigate(['home'], { replaceUrl: true });
+            setTimeout(() => {
+              this.router.navigate(['home'], { replaceUrl: true });
+            }, 500);
           },
         });
     });
@@ -93,7 +99,7 @@ export class VideoPage implements OnInit {
       await this.rtc.joinCall(
         this.visionCode,
         this.agoraRtcToken.agoraToken,
-        this.currentUser.id,
+        this.currentUser._id,
         this.rtc.rtcDetails
       );
       this.loading = false;

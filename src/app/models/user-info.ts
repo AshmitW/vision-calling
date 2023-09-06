@@ -1,9 +1,5 @@
 export class UserInfo {
-  id: string;
-  realm: string;
-  username: string;
+  _id: string;
+  name: string;
   email: string;
-  emailVerified: boolean;
-  verificationToken: string;
-  additionalProp1: {};
 }

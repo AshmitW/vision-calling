@@ -14,10 +14,7 @@ register();
   imports: [IonicModule, RouterLink, RouterLinkActive, CommonModule],
 })
 export class AppComponent {
-  public appPages = [
-    { title: 'Home', url: '/home', icon: 'home' },
-    { title: 'Messages', url: '/messages', icon: 'mail' },
-  ];
+  public appPages = [{ title: 'Home', url: '/home', icon: 'home' }];
   public logoutPages = [{ title: 'Logout', func: 'logout()', icon: 'log-out' }];
   private isLogged: boolean;
 

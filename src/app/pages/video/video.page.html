@@ -3,7 +3,7 @@
     <div class="local-video-container draggable">
       <div class="local-video-player" id="local-player">
         <div class="local-name-wrapper">
-          <span class="user-name">{{ currentUser?.username || "..." }}</span>
+          <span class="user-name">{{ currentUser?.name || "..." }}</span>
         </div>
       </div>
     </div>
@@ -15,11 +15,9 @@
             [id]="'remote-user-player-'+ user.uid"
           >
             <ng-container *ngFor="let userDB of rtc?.remoteUsersDB">
-              <ng-container *ngIf="userDB.id === user.uid">
+              <ng-container *ngIf="userDB._id === user.uid">
                 <div class="remote-name-wrapper">
-                  <span class="user-name">
-                    {{ userDB?.username || "..." }}</span
-                  >
+                  <span class="user-name"> {{ userDB?.name || "..." }}</span>
                 </div>
               </ng-container>
             </ng-container>

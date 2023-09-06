@@ -99,7 +99,7 @@ export class RtcService {
       console.log('user-left', user, '7+');
       // When a user leaves, we use thier ID to remove from ourremoteUsers.
       this.remoteUsersDB = this.remoteUsersDB.filter(
-        (item) => item.id !== user.uid
+        (item) => item._id !== user.uid
       );
     });
     rtc.client.on('crypt-error', (user) => {

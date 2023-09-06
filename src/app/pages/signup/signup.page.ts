@@ -15,7 +15,7 @@ import { first } from 'rxjs';
 })
 export class SignupPage implements OnInit {
   loading: boolean = false;
-  username: string;
+  name: string;
   email: string;
   password: string;
 
@@ -51,14 +51,14 @@ export class SignupPage implements OnInit {
 
   // Sign up endpoint
   signUp() {
-    // If username, email and password are not correct then start the project
-    if (!this.username || !this.email || !this.password) {
+    // If username, email and password are not empty
+    if (!this.name || !this.email || !this.password) {
       this.presentToast('Please fill in all the fields!');
       return;
     }
     this.loading = true;
     this.userService
-      .signUp(this.username, this.email, this.password)
+      .signUp(this.name, this.email, this.password)
       .pipe(first())
       .subscribe({
         next: (data) => {

@@ -25,7 +25,10 @@ bootstrapApplication(AppComponent, {
     JwtHelperService,
     AuthGuardService,
     Swiper,
-    importProvidersFrom(IonicModule.forRoot({}), HttpClientModule),
+    importProvidersFrom(
+      IonicModule.forRoot({ mode: 'ios', swipeBackEnabled: true }),
+      HttpClientModule
+    ),
     provideRouter(routes),
   ],
 });

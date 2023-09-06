@@ -34,11 +34,22 @@ export const routes: Routes = [
       import('./pages/messages/messages.page').then((m) => m.MessagesPage),
     canActivate: [AuthGuard],
   },
-
   {
     path: 'video',
     loadComponent: () =>
       import('./pages/video/video.page').then((m) => m.VideoPage),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'invite',
+    loadComponent: () =>
+      import('./pages/invite/invite.page').then((m) => m.InvitePage),
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'live-users',
+    loadComponent: () =>
+      import('./pages/live-users/live-users.page').then((m) => m.LiveUsersPage),
     canActivate: [AuthGuard],
   },
 ];

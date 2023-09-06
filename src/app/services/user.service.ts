@@ -43,10 +43,10 @@ export class UserService {
     }
   }
 
-  // Login endpoint
+  // Login
   login(email: string, password: string) {
     return this.http
-      .post<UserToken>(`${environment.apiUrl}/users/login`, {
+      .post<UserToken>(`${environment.apiUrl}/auth/login`, {
         email,
         password,
       })
@@ -62,11 +62,11 @@ export class UserService {
       );
   }
 
-  // Signup endpoint
-  signUp(username: string, email: string, password: string) {
+  // Signup
+  signUp(name: string, email: string, password: string) {
     return this.http
-      .post<UserInfo>(`${environment.apiUrl}/signup`, {
-        username,
+      .post<any>(`${environment.apiUrl}/auth/register`, {
+        name,
         email,
         password,
       })
@@ -77,10 +77,66 @@ export class UserService {
       );
   }
 
+  // Get all users with filters
+  getAllUsers(skip, limit, keyword) {
+    return this.http
+      .get<any>(
+        `${environment.apiUrl}/user/all?skip=${skip ?? skip}&limit=${
+          limit ?? limit
+        }&keyword=${keyword ?? keyword}`
+      )
+      .pipe(
+        map((users) => {
+          return users;
+        })
+      );
+  }
+
+  // Get all live users with filters
+  getAllLiveUsers(skip, limit, keyword) {
+    return this.http
+      .get<any>(
+        `${environment.apiUrl}/user/all?skip=${skip ?? skip}&limit=${
+          limit ?? limit
+        }&keyword=${keyword ?? keyword}%islivestreaming=true`
+      )
+      .pipe(
+        map((users) => {
+          return users;
+        })
+      );
+  }
+
+  // Invite a user into a call and share the vision code with them
+  inviteUser(userId, visionCode) {
+    return this.http
+      .get<any>(
+        `${environment.apiUrl}/rtc/invite?userId=${userId}&visionCode=${visionCode}`
+      )
+      .pipe(
+        map((response) => {
+          return response;
+        })
+      );
+  }
+
+  // Join a user's live stream
+  joinStream(userId, visionCode) {
+    return this.http
+      .get<any>(
+        `${environment.apiUrl}/rtc/join-stream?userId=${userId}&visionCode=${visionCode}`
+      )
+      .pipe(
+        map((response) => {
+          return response;
+        })
+      );
+  }
+
   // Get user from ID with this endpoint
   getUser(id: string) {
     return this.http
-      .post<UserInfo>(`${environment.apiUrl}/users`, {
+      .post<any>(`${environment.apiUrl}/user/get`, {
         id,
       })
       .pipe(
@@ -90,10 +146,10 @@ export class UserService {
       );
   }
 
-  // Get current user from ID inside JWT with this endpoint
+  // Get current logged in user info
   getCurrentUser() {
-    return this.http.get<UserInfo>(`${environment.apiUrl}/whoAmI`).pipe(
-      map((user: UserInfo) => {
+    return this.http.get<any>(`${environment.apiUrl}/user/me`).pipe(
+      map((user: any) => {
         return user;
       })
     );

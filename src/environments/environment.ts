@@ -8,10 +8,10 @@
 //   apiUrl: 'http://localhost:3000',
 // };
 
-// Heroku
+// Firebase
 export const environment = {
   production: false,
-  apiUrl: 'https://vision-calling.herokuapp.com',
+  apiUrl: 'https://vision-calling.web.app/api',
 };
 
 /*
