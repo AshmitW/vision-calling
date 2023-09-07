@@ -20,10 +20,12 @@ import { AgoraToken } from 'src/app/models/agora-token';
 export class VideoPage implements OnInit {
   audioMuted: boolean;
   videoMuted: boolean;
-  visionCode: string = '';
-  agoraRtcToken: AgoraToken;
+  visionCode: string = localStorage.getItem('visionCode');
+  agoraRtcToken: string;
   loading: boolean = true;
   currentUser: UserInfo;
+  type: 'JOIN' | 'INVITE' = 'JOIN';
+  recieverId: string;
 
   constructor(
     public menuCtrl: MenuController,
@@ -43,43 +45,82 @@ export class VideoPage implements OnInit {
     this.makeFrameDraggable();
   }
 
-  // Get visionCode (Channel ID) from query params and get CurrentUser Info
+  // Get if its invite or join from query params and get CurrentUser Info
   getAllInfo() {
     this.route.queryParams.subscribe((params) => {
-      this.visionCode = params['visionCode'];
+      this.type = params['callType'];
       this.userService
         .getCurrentUser()
         .pipe(first())
         .subscribe({
-          next: (user: UserInfo) => {
-            this.currentUser = user;
-            this.userService
-              .getAgoraRtcToken(this.visionCode, this.currentUser._id)
-              .pipe(first())
-              .subscribe({
-                next: (agoraToken: AgoraToken) => {
-                  this.agoraRtcToken = agoraToken;
-                  // console.log('TOKEN 2', this.agoraRtcToken.agoraToken);
-                  if (
-                    !this.visionCode ||
-                    !this.currentUser ||
-                    !this.agoraRtcToken
-                  ) {
-                    this.loading = false;
-                    setTimeout(() => {
-                      this.router.navigate(['home'], { replaceUrl: true });
-                    }, 500);
-                    return;
-                  }
-                  this.startCall();
-                },
-                error: (error) => {
-                  this.loading = false;
-                  setTimeout(() => {
-                    this.router.navigate(['home'], { replaceUrl: true });
-                  }, 500);
-                },
-              });
+          next: (user) => {
+            this.currentUser = user.data;
+            switch (this.type) {
+              case 'JOIN': {
+                this.userService
+                  .joinCall(this.visionCode)
+                  .pipe(first())
+                  .subscribe({
+                    next: (response) => {
+                      console.log('AGORA JOIN: ', response.data.agoraToken);
+                      this.agoraRtcToken = response.data.agoraToken;
+                      if (
+                        !this.visionCode ||
+                        !this.currentUser ||
+                        !this.agoraRtcToken
+                      ) {
+                        this.loading = false;
+                        setTimeout(() => {
+                          this.router.navigate(['home'], { replaceUrl: true });
+                        }, 500);
+                        return;
+                      }
+                      this.startCall();
+                    },
+                    error: (error) => {
+                      this.loading = false;
+                      setTimeout(() => {
+                        this.router.navigate(['home'], { replaceUrl: true });
+                      }, 500);
+                    },
+                  });
+                break;
+              }
+              case 'INVITE': {
+                this.recieverId = params['recieverId'];
+                this.userService
+                  .inviteCall(this.recieverId, this.visionCode)
+                  .pipe(first())
+                  .subscribe({
+                    next: (response) => {
+                      console.log('AGORA JOIN: ', response.data.agoraToken);
+                      this.agoraRtcToken = response.data.agoraToken;
+                      if (
+                        !this.visionCode ||
+                        !this.currentUser ||
+                        !this.agoraRtcToken
+                      ) {
+                        this.loading = false;
+                        setTimeout(() => {
+                          this.router.navigate(['home'], { replaceUrl: true });
+                        }, 500);
+                        return;
+                      }
+                      this.startCall();
+                    },
+                    error: (error) => {
+                      this.loading = false;
+                      setTimeout(() => {
+                        this.router.navigate(['home'], { replaceUrl: true });
+                      }, 500);
+                    },
+                  });
+                break;
+              }
+              default: {
+                break;
+              }
+            }
           },
           error: (error) => {
             this.loading = false;
@@ -94,11 +135,11 @@ export class VideoPage implements OnInit {
   // Create RTC client from RTC service, listen to all events and join call with the info received
   async startCall() {
     try {
-      this.rtc.rtcDetails.client = this.rtc.createRTCClient();
+      this.rtc.rtcDetails.client = this.rtc.createRTCClient('rtc');
       this.rtc.agoraServerEvents(this.rtc.rtcDetails);
       await this.rtc.joinCall(
         this.visionCode,
-        this.agoraRtcToken.agoraToken,
+        this.agoraRtcToken,
         this.currentUser._id,
         this.rtc.rtcDetails
       );
@@ -136,8 +177,21 @@ export class VideoPage implements OnInit {
 
   // Leave call and remove current page from history stack
   async end() {
-    await this.rtc.leaveCall(this.rtc.rtcDetails);
-    this.router.navigate(['home'], { replaceUrl: true });
+    this.userService
+      .endRtcSession()
+      .pipe(first())
+      .subscribe({
+        next: async (response) => {
+          await this.rtc.leaveCall(this.rtc.rtcDetails);
+          this.router.navigate(['home'], { replaceUrl: true });
+        },
+        error: (error) => {
+          setTimeout(async () => {
+            await this.rtc.leaveCall(this.rtc.rtcDetails);
+            this.router.navigate(['home'], { replaceUrl: true });
+          }, 500);
+        },
+      });
   }
 
   // Make the localVideoTrack Movable

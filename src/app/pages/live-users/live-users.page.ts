@@ -66,7 +66,7 @@ export class LiveUsersPage implements OnInit {
       return;
     }
     this.userService
-      .joinStream(userId, this.visionCode)
+      .joinStream(userId)
       .pipe(first())
       .subscribe({
         next: (response) => {

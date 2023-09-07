@@ -51,7 +51,7 @@ export class SignupPage implements OnInit {
 
   // Sign up endpoint
   signUp() {
-    // If username, email and password are not empty
+    // If name, email and password are not empty
     if (!this.name || !this.email || !this.password) {
       this.presentToast('Please fill in all the fields!');
       return;

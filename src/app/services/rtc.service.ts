@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import AgoraRTC from 'agora-rtc-sdk-ng';
+import AgoraRTC, { ClientRole } from 'agora-rtc-sdk-ng';
 import { RtcInfo } from '../models/rtc-info';
 import { RtcUserInfo } from '../models/rtc-user-info';
 import { first } from 'rxjs';
 import { UserService } from './user.service';
+import { RoleInfo } from '../models/role-info';
 
 @Injectable({
   providedIn: 'root',
@@ -27,7 +28,7 @@ export class RtcService {
       '007eJxTYFjSbWL2faF2/3Xld/M5u44/9b0kVz6P5/u+AtFVYdwni/kVGFIMLZMsUi0szY2MDU1MDUyTjC3NzQwM0wxNkxNTDZNMo62dUxoCGRm2PXBiZGSAQBCfj6EsszgzP083OTEnJzMvnYEBAH6NIn0=',
     uid: Math.round(Math.random() * (999 - 1) + 1).toString(),
   };
-
+  mode: 'rtc' | 'live';
   // RemoteUsers where we store our remoteUsers video and audio feed
   remoteUsers: RtcUserInfo[] = [];
   // Remote users where we store the info received from our DB for diplay names
@@ -35,13 +36,21 @@ export class RtcService {
   constructor(private userService: UserService) {}
 
   // Creating the RTC Client
-  createRTCClient() {
-    return AgoraRTC.createClient({ mode: 'rtc', codec: 'h264' });
+  createRTCClient(mode: 'rtc' | 'live') {
+    this.mode = mode;
+    return AgoraRTC.createClient({ mode: mode, codec: 'h264' });
   }
 
   // To Join call, create localtracks and publish it
-  async joinCall(channel: string, token: string, uid: string, rtc: RtcInfo) {
-    await rtc.client.join(this.options.appId, channel, token, uid);
+  async joinCall(
+    visionCode: string,
+    token: string,
+    uid: string,
+    rtc: RtcInfo,
+    role: ClientRole = 'host'
+  ) {
+    if (this.mode === 'live') await rtc.client.setClientRole(role);
+    await rtc.client.join(this.options.appId, visionCode, token, uid);
     this.rtcDetails.localAudioTrack =
       await AgoraRTC.createMicrophoneAudioTrack();
     this.rtcDetails.localVideoTrack = await AgoraRTC.createCameraVideoTrack({
@@ -78,13 +87,13 @@ export class RtcService {
     });
     rtc.client.on('user-joined', (user) => {
       console.log('user-joined', user, this.remoteUsers, '4+');
-      // When a new user joins, we use thier ID to get their username and add to our remoteUsers.
+      // When a new user joins, we use thier ID to get their name and add to our remoteUsers.
       this.userService
         .getUser(user.uid.toString())
         .pipe(first())
         .subscribe({
           next: (userDB) => {
-            this.remoteUsersDB.push(userDB);
+            this.remoteUsersDB.push(userDB.data);
           },
           error: (error) => {},
         });

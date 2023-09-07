@@ -69,7 +69,7 @@ export class HomePage implements OnInit {
     }
     this.router.navigate(['video'], {
       queryParams: {
-        visionCode: this.visionCode,
+        callType: 'JOIN',
       },
     });
   }
@@ -90,15 +90,7 @@ export class HomePage implements OnInit {
     try {
       switch (ev.detail.data.action) {
         case 'Join': {
-          if (!this.visionCode) {
-            this.presentToast('Please enter a Vision Code');
-            return;
-          }
-          this.router.navigate(['live-users'], {
-            queryParams: {
-              visionCode: this.visionCode,
-            },
-          });
+          this.router.navigate(['live-users']);
           break;
         }
         case 'Create': {

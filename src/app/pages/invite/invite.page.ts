@@ -65,21 +65,13 @@ export class InvitePage implements OnInit {
       this.router.navigate(['home']);
       return;
     }
-    this.userService
-      .inviteUser(userId, this.visionCode)
-      .pipe(first())
-      .subscribe({
-        next: (response) => {
-          this.router.navigate(['video'], {
-            queryParams: {
-              visionCode: this.visionCode,
-            },
-          });
-        },
-        error: (error) => {
-          this.presentToast(error.error.errors.message);
-        },
-      });
+
+    this.router.navigate(['video'], {
+      queryParams: {
+        callType: 'INVITE',
+        recieverId: userId,
+      },
+    });
   }
 
   refreshUsers(event) {

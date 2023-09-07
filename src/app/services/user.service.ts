@@ -136,11 +136,35 @@ export class UserService {
       );
   }
 
-  // Invite a user into a call and share the vision code with them
-  inviteUser(userId: string, visionCode: string) {
+  // Join a call
+  joinCall(visionCode: string) {
+    return this.http
+      .get<any>(`${environment.apiUrl}/rtc/join-call?visionCode=${visionCode}`)
+      .pipe(
+        map((response) => {
+          return response;
+        })
+      );
+  }
+
+  // Invite a user into a call
+  inviteCall(receiverId: string, visionCode: string) {
     return this.http
       .get<any>(
-        `${environment.apiUrl}/rtc/invite?userId=${userId}&visionCode=${visionCode}`
+        `${environment.apiUrl}/rtc/invite-call?visionCode=${visionCode}&userId=${receiverId}`
+      )
+      .pipe(
+        map((response) => {
+          return response;
+        })
+      );
+  }
+
+  // Create a live stream
+  createStream(visionCode: string) {
+    return this.http
+      .get<any>(
+        `${environment.apiUrl}/rtc/join-stream?visioncode=${visionCode}`
       )
       .pipe(
         map((response) => {
@@ -150,11 +174,9 @@ export class UserService {
   }
 
   // Join a user's live stream
-  joinStream(userId: string, visionCode: string) {
+  joinStream(hostId: string) {
     return this.http
-      .get<any>(
-        `${environment.apiUrl}/rtc/join-stream?userid=${userId}&visioncode=${visionCode}`
-      )
+      .get<any>(`${environment.apiUrl}/rtc/join-stream?hostId=${hostId}`)
       .pipe(
         map((response) => {
           return response;
@@ -162,13 +184,24 @@ export class UserService {
       );
   }
 
-  // Get user from ID with this endpoint
-  getUser(id: string) {
-    return this.http.get<any>(`${environment.apiUrl}/user/get?id=${id}`).pipe(
-      map((user) => {
-        return user;
+  // End RTC session
+  endRtcSession() {
+    return this.http.get<any>(`${environment.apiUrl}/rtc/end-session`).pipe(
+      map((response) => {
+        return response;
       })
     );
+  }
+
+  // Get user from ID with this endpoint
+  getUser(userId: string) {
+    return this.http
+      .get<any>(`${environment.apiUrl}/user/get?userId=${userId}`)
+      .pipe(
+        map((user) => {
+          return user;
+        })
+      );
   }
 
   // Get current logged in user info
