@@ -78,7 +78,6 @@ export class LoginPage implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          console.log(error);
           // Show validation errors in toast
           if (error.error.message === 'validation error') {
             this.presentToast(error.error.errors.errors[0].messages[0]);

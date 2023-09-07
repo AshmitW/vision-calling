@@ -78,7 +78,7 @@ export class UserService {
   }
 
   // Get all users with filters
-  getAllUsers(skip, limit, keyword) {
+  getAllUsers(skip: number, limit: number, keyword: string) {
     return this.http
       .get<any>(
         `${environment.apiUrl}/user/all?skip=${skip ?? skip}&limit=${
@@ -92,8 +92,37 @@ export class UserService {
       );
   }
 
+  // Get all messages with filters
+  getAllMessages(skip: number, limit: number) {
+    return this.http
+      .get<any>(
+        `${environment.apiUrl}/msg/all?skip=${skip ?? skip}&limit=${
+          limit ?? limit
+        }`
+      )
+      .pipe(
+        map((msges) => {
+          return msges;
+        })
+      );
+  }
+
+  // send message
+  sendMessage(receiverId: string, text: string) {
+    return this.http
+      .post<any>(`${environment.apiUrl}/msg/send`, {
+        receiverId,
+        text,
+      })
+      .pipe(
+        map((msg) => {
+          return msg;
+        })
+      );
+  }
+
   // Get all live users with filters
-  getAllLiveUsers(skip, limit, keyword) {
+  getAllLiveUsers(skip: number, limit: number, keyword: string) {
     return this.http
       .get<any>(
         `${environment.apiUrl}/user/all?skip=${skip ?? skip}&limit=${
@@ -108,7 +137,7 @@ export class UserService {
   }
 
   // Invite a user into a call and share the vision code with them
-  inviteUser(userId, visionCode) {
+  inviteUser(userId: string, visionCode: string) {
     return this.http
       .get<any>(
         `${environment.apiUrl}/rtc/invite?userId=${userId}&visionCode=${visionCode}`
@@ -121,10 +150,10 @@ export class UserService {
   }
 
   // Join a user's live stream
-  joinStream(userId, visionCode) {
+  joinStream(userId: string, visionCode: string) {
     return this.http
       .get<any>(
-        `${environment.apiUrl}/rtc/join-stream?userId=${userId}&visionCode=${visionCode}`
+        `${environment.apiUrl}/rtc/join-stream?userid=${userId}&visioncode=${visionCode}`
       )
       .pipe(
         map((response) => {
@@ -135,15 +164,11 @@ export class UserService {
 
   // Get user from ID with this endpoint
   getUser(id: string) {
-    return this.http
-      .post<any>(`${environment.apiUrl}/user/get`, {
-        id,
+    return this.http.get<any>(`${environment.apiUrl}/user/get?id=${id}`).pipe(
+      map((user) => {
+        return user;
       })
-      .pipe(
-        map((user) => {
-          return user;
-        })
-      );
+    );
   }
 
   // Get current logged in user info

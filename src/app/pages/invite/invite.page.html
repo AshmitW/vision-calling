@@ -10,9 +10,6 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-back-button></ion-back-button>
-      </ion-buttons>
       <ion-title size="medium">Invite other users into call</ion-title>
     </ion-toolbar>
   </ion-header>
@@ -30,6 +27,7 @@
     <ion-item
       *ngFor="let user of users; let index"
       (click)="inviteToCall(user._id)"
+      button
     >
       <ion-avatar slot="start">
         <ion-icon name="person-circle" size="large"></ion-icon>

@@ -4,6 +4,14 @@
       <ion-back-button defaultHref="home"></ion-back-button>
     </ion-buttons>
     <ion-title>Messages</ion-title>
+    <ion-buttons slot="end">
+      <ion-icon
+        (click)="selectUserModal()"
+        size="large"
+        color="danger"
+        name="add-circle"
+      ></ion-icon>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -15,9 +23,152 @@
   </ion-header>
   <div class="input-group">
     <ion-list>
-      <ion-item>
-        <ion-text>Future task</ion-text>
+      <ion-item
+        *ngFor="let msg of messages; let index"
+        button
+        detail="true"
+        (click)="openMsgModal(msg)"
+      >
+        <ion-avatar slot="start">
+          <ion-icon name="person-circle" size="large"></ion-icon>
+        </ion-avatar>
+
+        <ion-label>
+          <h1 style="color: white">{{ msg.receiver.name }}</h1>
+          <p>{{ msg.lastMessage }}</p>
+        </ion-label>
+        <ion-label slot="end">
+          <p>{{ convertDate(msg.updatedAt) }}</p>
+          <p>{{ convertTime(msg.updatedAt) }}</p>
+        </ion-label>
       </ion-item>
     </ion-list>
   </div>
+  <ion-modal
+    [isOpen]="isMsgModalOpen"
+    (onDidDismiss)="onDidDismissMsgModal()"
+    mode="ios"
+  >
+    <ion-header [translucent]="true">
+      <ion-toolbar>
+        <ion-title>Message</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ng-template>
+      <ion-content [fullscreen]="true">
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button (click)="cancelMsgModal()">Close</ion-button>
+          </ion-buttons>
+          <ion-title>{{ msg.receiver.name }}</ion-title>
+        </ion-toolbar>
+        <ion-list lines="full">
+          <ion-item *ngFor="let chat of msg.chats; let index">
+            <ion-label
+              slot="{{ chat.senderId !== user._id ? 'start' : 'end' }}"
+            >
+              <h1 style="color: white">{{ chat.text }}</h1>
+              <p>
+                {{ chat.senderId !== user._id ? msg.receiver.name : user.name }}
+              </p>
+            </ion-label>
+            <ion-label
+              slot="{{ chat.senderId !== user._id ? 'end' : 'start' }}"
+            >
+              <p>{{ convertDate(msg.createdAt) }}</p>
+              <p>{{ convertTime(msg.createdAt) }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+      <ion-footer>
+        <ion-item color="danger">
+          <ion-input placeholder="Enter text" [(ngModel)]="newText"></ion-input>
+          <ion-button slot="end" (click)="sendMessage(msg.receiver._id)">
+            <ion-icon slot="icon-only" name="send"></ion-icon>
+          </ion-button>
+        </ion-item>
+      </ion-footer>
+    </ng-template>
+  </ion-modal>
+  <ion-modal
+    [isOpen]="isSendMsgModalOpen"
+    (onDidDismiss)="onDidDismissSendMsgModal()"
+    mode="ios"
+  >
+    <ion-header [translucent]="true">
+      <ion-toolbar>
+        <ion-title>Select a user</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ng-template>
+      <ion-content [fullscreen]="true" *ngIf="sendMsgModalStep === 1">
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button (click)="cancelSendMsgModal()">Close</ion-button>
+          </ion-buttons>
+          <ion-title>Select a user</ion-title>
+        </ion-toolbar>
+        <ion-refresher slot="fixed" (ionRefresh)="refreshUsers($event)">
+          <ion-refresher-content></ion-refresher-content>
+        </ion-refresher>
+        <ion-searchbar
+          animated="true"
+          placeholder="Search users"
+          inputmode="search"
+          [(ngModel)]="searchKeyword"
+          (ionChange)="getUsers()"
+        ></ion-searchbar>
+        <ion-list>
+          <ion-item
+            *ngFor="let user of users; let index"
+            (click)="selectUser(user)"
+            button
+          >
+            <ion-avatar slot="start">
+              <ion-icon name="person-circle" size="large"></ion-icon>
+            </ion-avatar>
+            <ion-label>{{ user.name }}</ion-label>
+          </ion-item>
+        </ion-list>
+        <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+          <ion-infinite-scroll-content></ion-infinite-scroll-content>
+        </ion-infinite-scroll>
+      </ion-content>
+      <ion-content [fullscreen]="true" *ngIf="sendMsgModalStep === 2">
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button (click)="cancelSendMsgModal()">Close</ion-button>
+          </ion-buttons>
+          <ion-title>{{ selectedUser.name }}</ion-title>
+        </ion-toolbar>
+        <ion-list lines="full">
+          <ion-item *ngFor="let chat of msg.chats; let index">
+            <ion-label
+              slot="{{ chat.senderId !== user._id ? 'start' : 'end' }}"
+            >
+              <h1 style="color: white">{{ chat.text }}</h1>
+              <p>
+                {{ chat.senderId !== user._id ? msg.receiver.name : user.name }}
+              </p>
+            </ion-label>
+            <ion-label
+              slot="{{ chat.senderId !== user._id ? 'end' : 'start' }}"
+            >
+              <p>{{ convertDate(msg.createdAt) }}</p>
+              <p>{{ convertTime(msg.createdAt) }}</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+      <ion-footer *ngIf="sendMsgModalStep === 2">
+        <ion-item color="danger">
+          <ion-input placeholder="Enter text" [(ngModel)]="newText"></ion-input>
+          <ion-button slot="end" (click)="sendMessage(selectedUser._id)">
+            <ion-icon slot="icon-only" name="send"></ion-icon>
+          </ion-button>
+        </ion-item>
+      </ion-footer>
+    </ng-template>
+  </ion-modal>
 </ion-content>

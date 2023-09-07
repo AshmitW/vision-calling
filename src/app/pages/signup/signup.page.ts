@@ -70,18 +70,12 @@ export class SignupPage implements OnInit {
         },
         error: (error) => {
           this.loading = false;
-          // Showing different errors based on code
-          if (error.error.error.code === 'VALIDATION_FAILED') {
-            if (error.error.error.details[0].code === 'format') {
-              this.presentToast('The format for email is incorrect!');
-            }
-            if (error.error.error.details[0].code === 'minLength') {
-              this.presentToast(
-                'Password should be minimum 8 characters long!'
-              );
-            }
+          // Show validation errors in toast
+          if (error.error.message === 'validation error') {
+            this.presentToast(error.error.errors.errors[0].messages[0]);
           } else {
-            this.presentToast(error.error.error.message);
+            // Show Other errors in toast
+            this.presentToast(error.error.errors.message);
           }
         },
       });
