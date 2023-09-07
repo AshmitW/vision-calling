@@ -33,9 +33,9 @@
         <ion-icon name="person-circle" size="large"></ion-icon>
       </ion-avatar>
       <ion-label>{{ user.name }}</ion-label>
-      <ng-template *ngIf="user.isLiveStreaming">
+      <ng-container *ngIf="user.isLiveStreaming">
         <ion-badge color="danger" slot="end">LIVE</ion-badge>
-      </ng-template>
+      </ng-container>
     </ion-item>
   </ion-list>
   <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">

@@ -4,29 +4,26 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule, MenuController } from '@ionic/angular';
 import { RtcService } from 'src/app/services/rtc.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import interact from 'interactjs';
 import { UserService } from 'src/app/services/user.service';
 import { first } from 'rxjs';
 import { UserInfo } from 'src/app/models/user-info';
-import { AgoraToken } from 'src/app/models/agora-token';
 
 @Component({
-  selector: 'app-video',
-  templateUrl: './video.page.html',
-  styleUrls: ['./video.page.scss'],
+  selector: 'app-live-stream',
+  templateUrl: './live-stream.page.html',
+  styleUrls: ['./live-stream.page.scss'],
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule],
 })
-export class VideoPage implements OnInit {
+export class LiveStreamPage implements OnInit {
   audioMuted: boolean;
   videoMuted: boolean;
   visionCode: string = localStorage.getItem('visionCode');
   agoraRtcToken: string;
   loading: boolean = true;
   currentUser: UserInfo;
-  type: 'JOIN' | 'INVITE';
-  recieverId: string;
-  soloUser: boolean = true;
+  type: 'JOIN' | 'CREATE';
+  hostId: string;
 
   constructor(
     public menuCtrl: MenuController,
@@ -42,14 +39,12 @@ export class VideoPage implements OnInit {
     this.menuCtrl.enable(false);
   }
 
-  ngOnInit() {
-    this.makeFrameDraggable();
-  }
+  ngOnInit() {}
 
-  // Get if its invite or join from query params and get CurrentUser Info
+  // Get if its create or join from query params and get CurrentUser Info
   getAllInfo() {
     this.route.queryParams.subscribe(async (params) => {
-      this.type = await params['callType'];
+      this.type = await params['streamType'];
       this.userService
         .getCurrentUser()
         .pipe(first())
@@ -58,11 +53,13 @@ export class VideoPage implements OnInit {
             this.currentUser = user.data;
             switch (this.type) {
               case 'JOIN': {
+                this.hostId = params['hostId'];
                 this.userService
-                  .joinCall(this.visionCode)
+                  .joinStream(this.hostId)
                   .pipe(first())
                   .subscribe({
                     next: (response) => {
+                      this.visionCode = response.data.visionCode;
                       this.agoraRtcToken = response.data.agoraToken;
                       if (
                         !this.visionCode ||
@@ -75,7 +72,7 @@ export class VideoPage implements OnInit {
                         }, 500);
                         return;
                       }
-                      this.startCall();
+                      this.startStream();
                     },
                     error: (error) => {
                       this.loading = false;
@@ -86,10 +83,9 @@ export class VideoPage implements OnInit {
                   });
                 break;
               }
-              case 'INVITE': {
-                this.recieverId = params['recieverId'];
+              case 'CREATE': {
                 this.userService
-                  .inviteCall(this.recieverId, this.visionCode)
+                  .createStream(this.visionCode)
                   .pipe(first())
                   .subscribe({
                     next: (response) => {
@@ -105,7 +101,7 @@ export class VideoPage implements OnInit {
                         }, 500);
                         return;
                       }
-                      this.startCall();
+                      this.startStream();
                     },
                     error: (error) => {
                       this.loading = false;
@@ -131,60 +127,27 @@ export class VideoPage implements OnInit {
     });
   }
 
-  // Create RTC client from RTC service, listen to all events and join call with the info received
-  async startCall() {
+  // Create RTC client from RTC service with live mode, listen to all events and join/create stream with the info received
+  async startStream() {
     try {
-      this.rtc.rtcDetails.client = this.rtc.createRTCClient('rtc', 'h264');
+      this.rtc.rtcDetails.client = this.rtc.createRTCClient('live', 'vp9');
       this.rtc.agoraServerEvents(this.rtc.rtcDetails);
       await this.rtc.joinCall(
         this.visionCode,
         this.agoraRtcToken,
         this.currentUser._id,
-        this.rtc.rtcDetails
+        this.rtc.rtcDetails,
+        this.type === 'CREATE' ? 'host' : 'audience',
+        this.hostId
       );
       this.loading = false;
-      // keep checking if solo user
-      this.rtc.soloUserObs.subscribe((soloUser) => {
-        if (soloUser) this.turnOnSoloView();
-        else this.turnOffSoloView();
+      // keep checking if host left
+      this.rtc.hostLeftObs.subscribe((hostLeft) => {
+        if (hostLeft === true) this.end();
       });
     } catch (error) {
       console.log(error);
     }
-  }
-
-  turnOnSoloView() {
-    document
-      .getElementById('local-video-container')
-      .classList.remove('local-video-container');
-    document
-      .getElementById('local-video-container')
-      .classList.remove('local-video-container');
-    document
-      .getElementById('local-player')
-      .classList.remove('local-video-player');
-    document
-      .getElementById('local-video-container')
-      .classList.add('local-video-container-solo');
-    document
-      .getElementById('local-player')
-      .classList.add('local-video-player-solo');
-  }
-
-  turnOffSoloView() {
-    document
-      .getElementById('local-video-container')
-      .classList.remove('local-video-container-solo');
-    document
-      .getElementById('local-player')
-      .classList.remove('local-video-player-solo');
-    document
-      .getElementById('local-video-container')
-      .classList.add('local-video-container');
-    document
-      .getElementById('local-video-container')
-      .classList.add('local-video-container');
-    document.getElementById('local-player').classList.add('local-video-player');
   }
 
   // Mute the audio
@@ -215,47 +178,25 @@ export class VideoPage implements OnInit {
 
   // Leave call and remove current page from history stack
   async end() {
+    this.loading = true;
     this.userService
       .endRtcSession()
       .pipe(first())
       .subscribe({
-        next: async (response) => {
-          await this.rtc.leaveCall(this.rtc.rtcDetails);
-          this.router.navigate(['home'], { replaceUrl: true });
+        next: (response) => {
+          this.loading = false;
+          setTimeout(async () => {
+            await this.rtc.leaveCall(this.rtc.rtcDetails);
+            this.router.navigate(['home'], { replaceUrl: true });
+          }, 500);
         },
         error: (error) => {
+          this.loading = false;
           setTimeout(async () => {
             await this.rtc.leaveCall(this.rtc.rtcDetails);
             this.router.navigate(['home'], { replaceUrl: true });
           }, 500);
         },
       });
-  }
-
-  // Make the localVideoTrack Movable
-  makeFrameDraggable() {
-    interact('.draggable').draggable({
-      inertia: true,
-      modifiers: [
-        interact.modifiers.restrictRect({
-          restriction: 'parent',
-          endOnly: true,
-        }),
-      ],
-      autoScroll: true,
-      listeners: {
-        move: dragMoveListener,
-        end(event) {},
-      },
-    });
-
-    function dragMoveListener(event) {
-      var target = event.target;
-      var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-      var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-      target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-      target.setAttribute('data-x', x);
-      target.setAttribute('data-y', y);
-    }
   }
 }

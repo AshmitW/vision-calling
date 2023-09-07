@@ -1,9 +1,9 @@
 <ion-content [fullscreen]="true">
   <div id="video-wrapper" class="video-wrapper">
-    <div class="local-video-container draggable">
-      <div class="local-video-player" id="local-player">
+    <div id="local-video-container" class="local-video-container-solo">
+      <div class="local-video-player-solo" id="local-player">
         <div class="local-name-wrapper">
-          <span class="user-name">{{ currentUser?.name || "..." }}</span>
+          <span class="user-name">{{ currentUser?.name || "loading..." }}</span>
         </div>
       </div>
     </div>
@@ -17,7 +17,9 @@
             <ng-container *ngFor="let userDB of rtc?.remoteUsersDB">
               <ng-container *ngIf="userDB._id === user.uid">
                 <div class="remote-name-wrapper">
-                  <span class="user-name"> {{ userDB?.name || "..." }}</span>
+                  <span class="user-name">
+                    {{ userDB?.name || "loading..." }}</span
+                  >
                 </div>
               </ng-container>
             </ng-container>

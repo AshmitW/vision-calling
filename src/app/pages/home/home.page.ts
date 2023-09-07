@@ -98,12 +98,11 @@ export class HomePage implements OnInit {
             this.presentToast('Please enter a Vision Code');
             return;
           }
-          this.presentToast('Create');
-          // this.router.navigate(['video'], {
-          //   queryParams: {
-          //     visionCode: this.visionCode,
-          //   },
-          // });
+          this.router.navigate(['live-stream'], {
+            queryParams: {
+              streamType: 'CREATE',
+            },
+          });
           break;
         }
         default: {

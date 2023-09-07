@@ -127,7 +127,7 @@ export class UserService {
       .get<any>(
         `${environment.apiUrl}/user/all?skip=${skip ?? skip}&limit=${
           limit ?? limit
-        }&keyword=${keyword ?? keyword}%islivestreaming=true`
+        }&keyword=${keyword ?? keyword}&isLiveStreaming=true`
       )
       .pipe(
         map((users) => {
@@ -164,7 +164,7 @@ export class UserService {
   createStream(visionCode: string) {
     return this.http
       .get<any>(
-        `${environment.apiUrl}/rtc/join-stream?visioncode=${visionCode}`
+        `${environment.apiUrl}/rtc/create-stream?visionCode=${visionCode}`
       )
       .pipe(
         map((response) => {

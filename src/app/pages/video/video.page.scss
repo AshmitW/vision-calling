@@ -32,6 +32,18 @@
   width: 100%;
 }
 
+.local-video-container-solo {
+	overflow: hidden;
+	display: flex;
+	z-index: 1;
+	height: 100%;
+	justify-content: flex-start;
+}
+
+.local-video-player-solo {
+	width: 100%;
+}  
+
 .local-video-player:first-child {
   border: 1px solid #ea4723;
 }

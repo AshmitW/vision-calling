@@ -46,7 +46,7 @@ export class LiveUsersPage implements OnInit {
 
   getLiveUsers() {
     this.userService
-      .getAllUsers(this.skip, this.limit, this.keyword)
+      .getAllLiveUsers(this.skip, this.limit, this.keyword)
       .pipe(first())
       .subscribe({
         next: (users) => {
@@ -60,26 +60,12 @@ export class LiveUsersPage implements OnInit {
   }
 
   joinLiveStream(userId) {
-    if (!this.visionCode) {
-      this.presentToast('Please enter a Vision Code');
-      this.router.navigate(['home']);
-      return;
-    }
-    this.userService
-      .joinStream(userId)
-      .pipe(first())
-      .subscribe({
-        next: (response) => {
-          this.router.navigate(['video'], {
-            queryParams: {
-              visionCode: this.visionCode,
-            },
-          });
-        },
-        error: (error) => {
-          this.presentToast(error.error.errors.message);
-        },
-      });
+    this.router.navigate(['live-stream'], {
+      queryParams: {
+        streamType: 'JOIN',
+        hostId: userId,
+      },
+    });
   }
 
   refreshUsers(event) {

@@ -52,4 +52,12 @@ export const routes: Routes = [
       import('./pages/live-users/live-users.page').then((m) => m.LiveUsersPage),
     canActivate: [AuthGuard],
   },
+  {
+    path: 'live-stream',
+    loadComponent: () =>
+      import('./pages/live-stream/live-stream.page').then(
+        (m) => m.LiveStreamPage
+      ),
+    canActivate: [AuthGuard],
+  },
 ];

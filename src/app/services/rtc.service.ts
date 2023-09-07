@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import AgoraRTC, { ClientRole } from 'agora-rtc-sdk-ng';
 import { RtcInfo } from '../models/rtc-info';
 import { RtcUserInfo } from '../models/rtc-user-info';
-import { first } from 'rxjs';
+import { Subject, first } from 'rxjs';
 import { UserService } from './user.service';
 import { RoleInfo } from '../models/role-info';
 
@@ -29,16 +29,22 @@ export class RtcService {
     uid: Math.round(Math.random() * (999 - 1) + 1).toString(),
   };
   mode: 'rtc' | 'live';
+  codec: 'h264' | 'vp9';
+  liveHostId: string;
   // RemoteUsers where we store our remoteUsers video and audio feed
   remoteUsers: RtcUserInfo[] = [];
   // Remote users where we store the info received from our DB for diplay names
   remoteUsersDB = [];
+  private hostLeft: Subject<any> = new Subject<any>();
+  public hostLeftObs = this.hostLeft.asObservable();
+  private soloUser: Subject<any> = new Subject<any>();
+  public soloUserObs = this.soloUser.asObservable();
   constructor(private userService: UserService) {}
 
   // Creating the RTC Client
-  createRTCClient(mode: 'rtc' | 'live') {
+  createRTCClient(mode: 'rtc' | 'live', codec: 'h264' | 'vp9') {
     this.mode = mode;
-    return AgoraRTC.createClient({ mode: mode, codec: 'h264' });
+    return AgoraRTC.createClient({ mode: mode, codec: codec });
   }
 
   // To Join call, create localtracks and publish it
@@ -47,21 +53,25 @@ export class RtcService {
     token: string,
     uid: string,
     rtc: RtcInfo,
-    role: ClientRole = 'host'
+    role: ClientRole = 'host',
+    hostId = ''
   ) {
     if (this.mode === 'live') await rtc.client.setClientRole(role);
+    this.liveHostId = hostId;
     await rtc.client.join(this.options.appId, visionCode, token, uid);
     this.rtcDetails.localAudioTrack =
       await AgoraRTC.createMicrophoneAudioTrack();
     this.rtcDetails.localVideoTrack = await AgoraRTC.createCameraVideoTrack({
       encoderConfig: '720p',
     });
-    this.rtcDetails.localAudioTrack.play();
-    this.rtcDetails.localVideoTrack.play('local-player');
-    await rtc.client.publish([
-      this.rtcDetails.localAudioTrack,
-      this.rtcDetails.localVideoTrack,
-    ]);
+    if (role !== 'audience') {
+      //   this.rtcDetails.localAudioTrack.play();
+      this.rtcDetails.localVideoTrack.play('local-player');
+      await rtc.client.publish([
+        this.rtcDetails.localAudioTrack,
+        this.rtcDetails.localVideoTrack,
+      ]);
+    }
   }
 
   // To subscribe to all events so we can get remote users and keep a long of all events
@@ -94,6 +104,8 @@ export class RtcService {
         .subscribe({
           next: (userDB) => {
             this.remoteUsersDB.push(userDB.data);
+            console.log('JOINED LENGTH', this.remoteUsersDB.length);
+            this.soloUser.next(this.remoteUsersDB.length === 0 ? true : false);
           },
           error: (error) => {},
         });
@@ -106,10 +118,14 @@ export class RtcService {
     });
     rtc.client.on('user-left', (user) => {
       console.log('user-left', user, '7+');
-      // When a user leaves, we use thier ID to remove from ourremoteUsers.
+      // When a user leaves, we use thier ID to remove from our remoteUsers.
       this.remoteUsersDB = this.remoteUsersDB.filter(
         (item) => item._id !== user.uid
       );
+      console.log('LEFT LENGTH', this.remoteUsersDB.length);
+      this.soloUser.next(this.remoteUsersDB.length === 0 ? true : false);
+      if (this.mode === 'live' && this.liveHostId === user.uid)
+        this.hostLeft.next(true);
     });
     rtc.client.on('crypt-error', (user) => {
       console.log('crypt-error', user, '8+');
