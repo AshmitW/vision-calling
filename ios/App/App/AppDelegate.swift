@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -18,6 +19,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
 		NotificationCenter.default.post(name: .capacitorDidFailToRegisterForRemoteNotifications, object: error)
 	}
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        NotificationCenter.default.post(name: Notification.Name.init("didReceiveRemoteNotification"), object: completionHandler, userInfo: userInfo)
+    }
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -53,5 +58,42 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // tracking app url opens, make sure to keep this call
         return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
+    
+//    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any]) {
+//            // If you are receiving a notification message while your app is in the background,
+//            // this callback will not be fired till the user taps on the notification launching the application.
+//            // TODO: Handle data of notification
+//
+//            // With swizzling disabled you must let Messaging know about the message, for Analytics
+//            Messaging.messaging().appDidReceiveMessage(userInfo)
+//
+//            // Print message ID.
+//    //        if let messageID = userInfo[gcmMessageIDKey] {
+//    //            print("Message ID: \(messageID)")
+//    //        }
+//
+//            // Print full message.
+//            print(userInfo)
+//        }
+        
+//        func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+//                         fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+//            // If you are receiving a notification message while your app is in the background,
+//            // this callback will not be fired till the user taps on the notification launching the application.
+//            // TODO: Handle data of notification
+//
+//            // With swizzling disabled you must let Messaging know about the message, for Analytics
+//            Messaging.messaging().appDidReceiveMessage(userInfo)
+//
+//            // Print message ID.
+//    //        if let messageID = userInfo[gcmMessageIDKey] {
+//    //            print("Message ID: \(messageID)")
+//    //        }
+//
+//            // Print full message.
+//            print(userInfo)
+//
+//            completionHandler(UIBackgroundFetchResult.newData)
+//        }
 
 }

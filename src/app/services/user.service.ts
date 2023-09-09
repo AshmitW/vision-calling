@@ -223,14 +223,11 @@ export class UserService {
 
   // Logout from where we remove the JWT
   logout() {
-    console.log('TEST');
     return this.http.get<any>(`${environment.apiUrl}/auth/logout`).pipe(
       map((response: any) => {
-        console.log('TEST2');
         localStorage.removeItem('userToken');
         this.tokenSubject.next(null);
         localStorage.removeItem('visionCode');
-        localStorage.removeItem('fcmToken');
         return response;
       })
     );

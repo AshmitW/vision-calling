@@ -9,6 +9,7 @@ import { Microphone } from '@mozartec/capacitor-microphone';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { FirebaseMessaging } from '@capacitor-firebase/messaging';
 
 @Component({
   selector: 'app-welcome',
@@ -148,9 +149,7 @@ export class WelcomePage implements OnInit {
       console.log('3+ Check Push success: ', checkPermissionsResult.receive);
       if (checkPermissionsResult.receive == 'granted') {
         this.pushPermissionStatus = 'granted';
-        this.addListeners();
         this.registerNotifications();
-        this.getDeliveredNotifications();
       } else {
         this.pushPermissionStatus = 'denied';
       }
@@ -182,10 +181,15 @@ export class WelcomePage implements OnInit {
   }
 
   async addListeners() {
-    await PushNotifications.removeAllListeners();
-    await PushNotifications.addListener('registration', (token) => {
-      console.info('Registration token: ', token.value);
-      localStorage.setItem('fcmToken', token.value);
+    await PushNotifications.addListener('registration', async (ptoken) => {
+      console.info('Registration token: ', ptoken.value);
+      let pushToken = ptoken.value; // Push token for Android
+      // Get FCM token instead the APN one returned by Capacitor
+      const { token } = await FirebaseMessaging.getToken();
+      pushToken = token;
+      console.info('before LOCAL ', pushToken);
+      localStorage.setItem('fcmToken', pushToken);
+      console.info('AFTER LOCAL ', pushToken);
     });
 
     await PushNotifications.addListener('registrationError', (err) => {
@@ -205,6 +209,30 @@ export class WelcomePage implements OnInit {
         await LocalNotifications.schedule({
           notifications: [options],
         });
+      }
+    );
+
+    await FirebaseMessaging.addListener(
+      'notificationReceived',
+      async (event) => {
+        console.log('notificationReceived: ', { event });
+        const options = {
+          //@ts-ignore
+          title: event.notification.data.title,
+          //@ts-ignore
+          body: event.notification.data.body,
+          id: Math.floor(Math.random() * Math.random()),
+          extra: event.notification.data,
+        };
+        await LocalNotifications.schedule({
+          notifications: [options],
+        });
+      }
+    );
+    await FirebaseMessaging.addListener(
+      'notificationActionPerformed',
+      (event) => {
+        console.log('notificationActionPerformed: ', { event });
       }
     );
 
@@ -257,9 +285,12 @@ export class WelcomePage implements OnInit {
         );
       }
     );
+    await PushNotifications.register();
+    this.getDeliveredNotifications();
   }
 
   async registerNotifications() {
+    await PushNotifications.removeAllListeners();
     let permStatus = await PushNotifications.checkPermissions();
 
     if (permStatus.receive === 'prompt') {
@@ -271,6 +302,7 @@ export class WelcomePage implements OnInit {
     }
 
     await PushNotifications.register();
+    this.addListeners();
   }
 
   async getDeliveredNotifications() {

@@ -184,6 +184,9 @@ export class VideoPage implements OnInit {
     document
       .getElementById('local-player')
       .classList.add('local-video-player-solo');
+    document
+      .getElementById('remote-container-wrapper')
+      .classList.add('remote-video-wrapper-solo');
   }
 
   turnOffSoloView() {
@@ -193,6 +196,9 @@ export class VideoPage implements OnInit {
     document
       .getElementById('local-player')
       .classList.remove('local-video-player-solo');
+    document
+      .getElementById('remote-container-wrapper')
+      .classList.remove('remote-video-wrapper-solo');
     document
       .getElementById('local-video-container')
       .classList.add('local-video-container');
