@@ -47,6 +47,7 @@ export class MessagesPage implements OnInit {
   limitUsers: number = 10;
   sendMsgModalStep: number = 1;
   openMsgId;
+  loading: boolean = false;
 
   constructor(
     private userService: UserService,
@@ -137,6 +138,7 @@ export class MessagesPage implements OnInit {
   }
 
   sendMessage(id) {
+    this.loading = true;
     this.userService
       .sendMessage(id, this.newText)
       .pipe(first())
@@ -146,6 +148,7 @@ export class MessagesPage implements OnInit {
           this.newText = '';
           this.scrollToBottomForMsg();
           this.getAllMessages();
+          this.loading = false;
         },
         error: (error) => {
           console.log(error);
