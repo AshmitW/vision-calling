@@ -182,14 +182,13 @@ export class WelcomePage implements OnInit {
 
   async addListeners() {
     await PushNotifications.addListener('registration', async (ptoken) => {
-      console.info('Registration token: ', ptoken.value);
+      console.info('Push Registration token: ', ptoken.value);
       let pushToken = ptoken.value; // Push token for Android
       // Get FCM token instead the APN one returned by Capacitor
       const { token } = await FirebaseMessaging.getToken();
+      console.info('FCM Registration token: ', token);
       pushToken = token;
-      console.info('before LOCAL ', pushToken);
       localStorage.setItem('fcmToken', pushToken);
-      console.info('AFTER LOCAL ', pushToken);
     });
 
     await PushNotifications.addListener('registrationError', (err) => {
