@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "529006743992",
+    "project_id": "vision-calling",
+    "storage_bucket": "vision-calling.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:529006743992:android:9665bfc5aadf7bef10ff4d",
+        "android_client_info": {
+          "package_name": "com.ashmit.vision"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "529006743992-fvndh23qtkplcmkent7kmqfouggguli7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-OiytiK7iqSt9epDClHIBzcmt3pOKnJg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "529006743992-fvndh23qtkplcmkent7kmqfouggguli7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

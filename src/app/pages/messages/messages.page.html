@@ -49,36 +49,36 @@
     (onDidDismiss)="onDidDismissMsgModal()"
     mode="ios"
   >
-    <ion-header [translucent]="true">
-      <ion-toolbar>
-        <ion-title>Message</ion-title>
-      </ion-toolbar>
-    </ion-header>
     <ng-template>
-      <ion-content [fullscreen]="true">
+      <ion-header>
         <ion-toolbar>
           <ion-buttons slot="start">
             <ion-button (click)="cancelMsgModal()">Close</ion-button>
           </ion-buttons>
           <ion-title>{{ msg.receiver.name }}</ion-title>
         </ion-toolbar>
+      </ion-header>
+      <ion-content #mainMsgContent>
         <ion-list lines="full">
-          <ion-item *ngFor="let chat of msg.chats; let index">
-            <ion-label
-              slot="{{ chat.senderId !== user._id ? 'start' : 'end' }}"
-            >
-              <h1 style="color: white">{{ chat.text }}</h1>
-              <p>
-                {{ chat.senderId !== user._id ? msg.receiver.name : user.name }}
-              </p>
-            </ion-label>
-            <ion-label
-              slot="{{ chat.senderId !== user._id ? 'end' : 'start' }}"
-            >
-              <p>{{ convertDate(msg.createdAt) }}</p>
-              <p>{{ convertTime(msg.createdAt) }}</p>
-            </ion-label>
-          </ion-item>
+          <ng-container *ngFor="let chat of msg.chats; let index">
+            <ion-item>
+              <ion-label
+                slot="{{ chat.senderId !== user._id ? 'start' : 'end' }}"
+              >
+                <h1 style="color: white">{{ chat.text }}</h1>
+                <p>
+                  {{ chat.senderId !== user._id ? msg.receiver.name : user.name
+                  }}
+                </p>
+              </ion-label>
+              <ion-label
+                slot="{{ chat.senderId !== user._id ? 'end' : 'start' }}"
+              >
+                <p>{{ convertDate(msg.createdAt) }}</p>
+                <p>{{ convertTime(msg.createdAt) }}</p>
+              </ion-label>
+            </ion-item>
+          </ng-container>
         </ion-list>
       </ion-content>
       <ion-footer>
@@ -96,19 +96,19 @@
     (onDidDismiss)="onDidDismissSendMsgModal()"
     mode="ios"
   >
-    <ion-header [translucent]="true">
-      <ion-toolbar>
-        <ion-title>Select a user</ion-title>
-      </ion-toolbar>
-    </ion-header>
     <ng-template>
-      <ion-content [fullscreen]="true" *ngIf="sendMsgModalStep === 1">
+      <ion-header>
         <ion-toolbar>
           <ion-buttons slot="start">
             <ion-button (click)="cancelSendMsgModal()">Close</ion-button>
           </ion-buttons>
-          <ion-title>Select a user</ion-title>
+          <ion-title
+            >{{ sendMsgModalStep === 1 ? 'Select a user' :
+            selectedUser.name}}</ion-title
+          >
         </ion-toolbar>
+      </ion-header>
+      <ion-content *ngIf="sendMsgModalStep === 1">
         <ion-refresher slot="fixed" (ionRefresh)="refreshUsers($event)">
           <ion-refresher-content></ion-refresher-content>
         </ion-refresher>
@@ -135,30 +135,27 @@
           <ion-infinite-scroll-content></ion-infinite-scroll-content>
         </ion-infinite-scroll>
       </ion-content>
-      <ion-content [fullscreen]="true" *ngIf="sendMsgModalStep === 2">
-        <ion-toolbar>
-          <ion-buttons slot="start">
-            <ion-button (click)="cancelSendMsgModal()">Close</ion-button>
-          </ion-buttons>
-          <ion-title>{{ selectedUser.name }}</ion-title>
-        </ion-toolbar>
+      <ion-content *ngIf="sendMsgModalStep === 2" #modalMsgContent>
         <ion-list lines="full">
-          <ion-item *ngFor="let chat of msg.chats; let index">
-            <ion-label
-              slot="{{ chat.senderId !== user._id ? 'start' : 'end' }}"
-            >
-              <h1 style="color: white">{{ chat.text }}</h1>
-              <p>
-                {{ chat.senderId !== user._id ? msg.receiver.name : user.name }}
-              </p>
-            </ion-label>
-            <ion-label
-              slot="{{ chat.senderId !== user._id ? 'end' : 'start' }}"
-            >
-              <p>{{ convertDate(msg.createdAt) }}</p>
-              <p>{{ convertTime(msg.createdAt) }}</p>
-            </ion-label>
-          </ion-item>
+          <ng-container *ngFor="let chat of msg.chats; let index">
+            <ion-item>
+              <ion-label
+                slot="{{ chat.senderId !== user._id ? 'start' : 'end' }}"
+              >
+                <h1 style="color: white">{{ chat.text }}</h1>
+                <p>
+                  {{ chat.senderId !== user._id ? msg.receiver.name : user.name
+                  }}
+                </p>
+              </ion-label>
+              <ion-label
+                slot="{{ chat.senderId !== user._id ? 'end' : 'start' }}"
+              >
+                <p>{{ convertDate(msg.createdAt) }}</p>
+                <p>{{ convertTime(msg.createdAt) }}</p>
+              </ion-label>
+            </ion-item>
+          </ng-container>
         </ion-list>
       </ion-content>
       <ion-footer *ngIf="sendMsgModalStep === 2">

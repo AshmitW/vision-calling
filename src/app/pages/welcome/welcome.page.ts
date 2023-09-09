@@ -7,7 +7,8 @@ import { Router } from '@angular/router';
 import { Camera } from '@capacitor/camera';
 import { Microphone } from '@mozartec/capacitor-microphone';
 import { Capacitor } from '@capacitor/core';
-import { platform } from 'process';
+import { PushNotifications } from '@capacitor/push-notifications';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 @Component({
   selector: 'app-welcome',
@@ -19,6 +20,7 @@ import { platform } from 'process';
 })
 export class WelcomePage implements OnInit {
   videoPermissionStatus: string = 'notInitiated';
+  pushPermissionStatus: string = 'notInitiated';
   micPermissionStatus: string = 'notInitiated';
   nativePlatform: boolean;
 
@@ -39,7 +41,7 @@ export class WelcomePage implements OnInit {
   // User has completed welcome setup
   welcomeCompleted() {
     localStorage.setItem('welcomeCompleted', 'true');
-    this.router.navigate(['/login'], { replaceUrl: true });
+    this.router.navigate(['login'], { replaceUrl: true });
   }
 
   // Triggered when last slide is called
@@ -109,6 +111,7 @@ export class WelcomePage implements OnInit {
       } else {
         this.micPermissionStatus = 'denied';
       }
+      this.requestPushPermissions();
     } catch (error) {
       console.error('checkPermissions Error: ' + JSON.stringify(error));
       this.micPermissionStatus = 'denied';
@@ -133,5 +136,146 @@ export class WelcomePage implements OnInit {
       this.micPermissionStatus = 'denied';
       console.log('3+ request Mic denied');
     }
+  }
+
+  // Check if push permission is granted
+  async checkPushPermissions() {
+    try {
+      const checkPermissionsResult = await PushNotifications.checkPermissions();
+      console.log(
+        'checkPermissionsResult: ' + JSON.stringify(checkPermissionsResult)
+      );
+      console.log('3+ Check Push success: ', checkPermissionsResult.receive);
+      if (checkPermissionsResult.receive == 'granted') {
+        this.pushPermissionStatus = 'granted';
+        this.addListeners();
+        this.registerNotifications();
+        this.getDeliveredNotifications();
+      } else {
+        this.pushPermissionStatus = 'denied';
+      }
+    } catch (error) {
+      console.error('checkPermissions Error: ' + JSON.stringify(error));
+      this.pushPermissionStatus = 'denied';
+      console.log('3+ Check Push denied');
+    }
+  }
+
+  // Ask push permission
+  async requestPushPermissions() {
+    try {
+      const requestPermissionsResult =
+        await PushNotifications.requestPermissions();
+      console.log(
+        'requestPermissionsResult: ' + JSON.stringify(requestPermissionsResult)
+      );
+      console.log(
+        '3+ request Push success: ',
+        requestPermissionsResult.receive
+      );
+      this.checkPushPermissions();
+    } catch (error) {
+      console.error('requestPermissions Error: ' + JSON.stringify(error));
+      this.pushPermissionStatus = 'denied';
+      console.log('3+ request Push denied');
+    }
+  }
+
+  async addListeners() {
+    await PushNotifications.removeAllListeners();
+    await PushNotifications.addListener('registration', (token) => {
+      console.info('Registration token: ', token.value);
+      localStorage.setItem('fcmToken', token.value);
+    });
+
+    await PushNotifications.addListener('registrationError', (err) => {
+      console.error('Registration error: ', err.error);
+    });
+
+    await PushNotifications.addListener(
+      'pushNotificationReceived',
+      async (notification) => {
+        console.log('Push notification received: ', notification);
+        const options = {
+          title: notification.data.title,
+          body: notification.data.body,
+          id: Math.floor(Math.random() * Math.random()),
+          extra: notification.data,
+        };
+        await LocalNotifications.schedule({
+          notifications: [options],
+        });
+      }
+    );
+
+    await LocalNotifications.addListener(
+      'localNotificationReceived',
+      async (notification) => {
+        console.log('localNotificationReceived', notification);
+      }
+    );
+
+    await LocalNotifications.addListener(
+      'localNotificationActionPerformed',
+      async (notification) => {
+        console.log('localNotificationActionPerformed', notification);
+        if (notification.notification.extra.type) {
+          switch (notification.notification.extra.type) {
+            case 'call': {
+              this.router.navigate(['video'], {
+                queryParams: {
+                  callType: 'INVITED',
+                  agoraToken: notification.notification.extra.agoraToken,
+                },
+              });
+              break;
+            }
+            case 'message': {
+              this.router.navigate(['messages'], {
+                queryParams: {
+                  openMsgId: notification.notification.extra.msgId,
+                },
+              });
+              break;
+            }
+            default: {
+              break;
+            }
+          }
+        }
+      }
+    );
+
+    await PushNotifications.addListener(
+      'pushNotificationActionPerformed',
+      async (notification) => {
+        console.log(
+          'Push notification action performed',
+          notification,
+          notification.actionId,
+          notification.inputValue
+        );
+      }
+    );
+  }
+
+  async registerNotifications() {
+    let permStatus = await PushNotifications.checkPermissions();
+
+    if (permStatus.receive === 'prompt') {
+      permStatus = await PushNotifications.requestPermissions();
+    }
+
+    if (permStatus.receive !== 'granted') {
+      throw new Error('User denied permissions!');
+    }
+
+    await PushNotifications.register();
+  }
+
+  async getDeliveredNotifications() {
+    const notificationList =
+      await PushNotifications.getDeliveredNotifications();
+    console.log('delivered notifications', notificationList);
   }
 }

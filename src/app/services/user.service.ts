@@ -1,12 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, catchError, map, of } from 'rxjs';
 import { UserToken } from '../models/user-token';
-import { UserInfo } from '../models/user-info';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { AgoraToken } from '../models/agora-token';
 
 @Injectable({
   providedIn: 'root',
@@ -15,13 +12,9 @@ export class UserService {
   private tokenSubject: BehaviorSubject<UserToken>;
   public token: Observable<UserToken>;
 
-  constructor(
-    private router: Router,
-    private http: HttpClient,
-    private jwtHelper: JwtHelperService
-  ) {
+  constructor(private http: HttpClient, private jwtHelper: JwtHelperService) {
     this.tokenSubject = new BehaviorSubject<UserToken>(
-      JSON.parse(localStorage.getItem('user-token'))
+      JSON.parse(localStorage.getItem('userToken'))
     );
     this.token = this.tokenSubject.asObservable();
   }
@@ -33,8 +26,8 @@ export class UserService {
 
   // To check if authenticated with the JWT
   public isAuthenticated(): boolean {
-    if (localStorage.getItem('user-token')) {
-      const token = JSON.parse(localStorage.getItem('user-token')).token;
+    if (localStorage.getItem('userToken')) {
+      const token = JSON.parse(localStorage.getItem('userToken')).token;
       // console.log(token);
       // Check whether the token is expired and return true or false
       return !this.jwtHelper.isTokenExpired(token);
@@ -45,16 +38,20 @@ export class UserService {
 
   // Login
   login(email: string, password: string) {
+    const fcmToken = localStorage.getItem('fcmToken')
+      ? localStorage.getItem('fcmToken')
+      : ' ';
     return this.http
       .post<UserToken>(`${environment.apiUrl}/auth/login`, {
         email,
         password,
+        fcmToken,
       })
       .pipe(
         map((token) => {
           const userToken: UserToken = token;
 
-          localStorage.setItem('user-token', JSON.stringify(userToken));
+          localStorage.setItem('userToken', JSON.stringify(userToken));
           this.tokenSubject.next(userToken);
 
           return userToken;
@@ -107,6 +104,17 @@ export class UserService {
       );
   }
 
+  // Get one message
+  getOneMessage(msgId: string) {
+    return this.http
+      .get<any>(`${environment.apiUrl}/msg/all?skip=0&limit=10&msgId=${msgId}`)
+      .pipe(
+        map((msge) => {
+          return msge;
+        })
+      );
+  }
+
   // send message
   sendMessage(receiverId: string, text: string) {
     return this.http
@@ -151,7 +159,7 @@ export class UserService {
   inviteCall(receiverId: string, visionCode: string) {
     return this.http
       .get<any>(
-        `${environment.apiUrl}/rtc/invite-call?visionCode=${visionCode}&userId=${receiverId}`
+        `${environment.apiUrl}/rtc/invite-call?visionCode=${visionCode}&receiverId=${receiverId}`
       )
       .pipe(
         map((response) => {
@@ -213,24 +221,18 @@ export class UserService {
     );
   }
 
-  // Get RTC token with this endpoint
-  getAgoraRtcToken(channelName: string, uid: string) {
-    return this.http
-      .post<AgoraToken>(`${environment.apiUrl}/agora/token`, {
-        channelName,
-        uid,
-      })
-      .pipe(
-        map((agoraToken) => {
-          return agoraToken;
-        })
-      );
-  }
-
   // Logout from where we remove the JWT
   logout() {
-    localStorage.removeItem('user-token');
-    this.tokenSubject.next(null);
-    this.router.navigate(['/login']);
+    console.log('TEST');
+    return this.http.get<any>(`${environment.apiUrl}/auth/logout`).pipe(
+      map((response: any) => {
+        console.log('TEST2');
+        localStorage.removeItem('userToken');
+        this.tokenSubject.next(null);
+        localStorage.removeItem('visionCode');
+        localStorage.removeItem('fcmToken');
+        return response;
+      })
+    );
   }
 }
