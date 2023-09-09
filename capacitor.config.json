@@ -2,5 +2,10 @@
   "appId": "com.ashmit.vision",
   "appName": "Vision Calling",
   "webDir": "www",
-  "bundledWebRuntime": false
+  "bundledWebRuntime": false,
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": ["badge", "sound", "alert"]
+    }
+  }
 }

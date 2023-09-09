@@ -68,7 +68,7 @@ export class InvitePage implements OnInit {
 
     this.router.navigate(['video'], {
       queryParams: {
-        callType: 'INVITE',
+        callType: 'INVITING',
         recieverId: userId,
       },
     });

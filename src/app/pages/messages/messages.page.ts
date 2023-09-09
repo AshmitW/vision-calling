@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -9,7 +9,7 @@ import {
 } from '@ionic/angular';
 import { UserService } from '../../services/user.service';
 import { first } from 'rxjs';
-import { OverlayEventDetail } from '@ionic/core/components';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-messages',
@@ -20,6 +20,9 @@ import { OverlayEventDetail } from '@ionic/core/components';
 })
 export class MessagesPage implements OnInit {
   @ViewChild(IonModal) modal: IonModal;
+  @ViewChild('mainMsgContent') private mainMsgContent: any;
+  @ViewChild('modalMsgContent') private modalMsgContent: any;
+
   messages = [];
   user = {
     _id: '',
@@ -43,15 +46,27 @@ export class MessagesPage implements OnInit {
   skipUsers: number = 0;
   limitUsers: number = 10;
   sendMsgModalStep: number = 1;
+  openMsgId;
+  loading: boolean = false;
 
   constructor(
     private userService: UserService,
-    private toastController: ToastController
+    private toastController: ToastController,
+    public _zone: NgZone,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+    this.checkIfOpenMsg();
     this.getAllMessages();
     this.getCurrentUser();
+  }
+
+  checkIfOpenMsg() {
+    this.route.queryParams.subscribe(async (params) => {
+      this.openMsgId = await params['openMsgId'];
+      if (this.openMsgId) this.getOneMessage();
+    });
   }
 
   // Toast template
@@ -63,6 +78,21 @@ export class MessagesPage implements OnInit {
     });
 
     await toast.present();
+  }
+
+  getOneMessage() {
+    this.userService
+      .getOneMessage(this.openMsgId)
+      .pipe(first())
+      .subscribe({
+        next: (message) => {
+          this.openMsgModal(message.data[0].items[0]);
+        },
+        error: (error) => {
+          console.log(error);
+          this.presentToast(error.error.errors.message);
+        },
+      });
   }
 
   getAllMessages() {
@@ -108,16 +138,17 @@ export class MessagesPage implements OnInit {
   }
 
   sendMessage(id) {
+    this.loading = true;
     this.userService
       .sendMessage(id, this.newText)
       .pipe(first())
       .subscribe({
-        next: (messages) => {
-          this.getAllMessages();
-          this.isMsgModalOpen = false;
-          this.isSendMsgModalOpen = false;
-          this.sendMsgModalStep = 1;
+        next: (message) => {
+          this.msg = message.data;
           this.newText = '';
+          this.scrollToBottomForMsg();
+          this.getAllMessages();
+          this.loading = false;
         },
         error: (error) => {
           console.log(error);
@@ -134,6 +165,7 @@ export class MessagesPage implements OnInit {
   openMsgModal(msg) {
     this.isMsgModalOpen = true;
     this.msg = msg;
+    this.scrollToBottomForMsg();
   }
 
   cancelMsgModal() {
@@ -192,5 +224,14 @@ export class MessagesPage implements OnInit {
   cancelSendMsgModal() {
     this.isSendMsgModalOpen = false;
     this.sendMsgModalStep = 1;
+  }
+
+  scrollToBottomForMsg() {
+    this._zone.run(() => {
+      setTimeout(() => {
+        if (this.mainMsgContent) this.mainMsgContent.scrollToBottom(500);
+        if (this.modalMsgContent) this.modalMsgContent.scrollToBottom(500);
+      });
+    });
   }
 }

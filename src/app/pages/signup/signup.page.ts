@@ -65,7 +65,7 @@ export class SignupPage implements OnInit {
           this.loading = false;
           // set a short and small timer of 500 miliseconds to allow the loading bar to turn off before changing routes
           setTimeout(() => {
-            this.router.navigate(['/login'], { replaceUrl: true });
+            this.router.navigate(['login'], { replaceUrl: true });
           }, 500);
         },
         error: (error) => {

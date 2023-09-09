@@ -1,3 +1,8 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Vision Calling</ion-title>
+  </ion-toolbar>
+</ion-header>
 <ion-content [fullscreen]="true">
   <div id="video-wrapper" class="video-wrapper">
     <div id="local-video-container" class="local-video-container-solo">
@@ -7,7 +12,11 @@
         </div>
       </div>
     </div>
-    <div class="uk-child-width-1-1 vid-grid" uk-grid>
+    <div
+      class="uk-child-width-1-1 vid-grid remote-video-wrapper-solo"
+      id="remote-container-wrapper"
+      uk-grid
+    >
       <div *ngFor="let user of rtc.rtcDetails.client?.remoteUsers">
         <div class="remote-video-container">
           <div

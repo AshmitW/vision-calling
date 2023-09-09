@@ -54,7 +54,7 @@ export class LoginPage implements OnInit {
   }
 
   routeToSignUp() {
-    this.router.navigate(['/signup']);
+    this.router.navigate(['signup']);
   }
 
   // login endpoint

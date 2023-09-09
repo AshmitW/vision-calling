@@ -40,15 +40,18 @@
           Video Permission denied.
         </p>
         <p *ngIf="micPermissionStatus === 'denied'">Mic Permission denied.</p>
+        <p *ngIf="pushPermissionStatus === 'denied'">
+          Notification Permission denied.
+        </p>
         <ng-container
-          *ngIf="videoPermissionStatus === 'denied' || micPermissionStatus === 'denied'"
+          *ngIf="videoPermissionStatus === 'denied' || micPermissionStatus === 'denied' || pushPermissionStatus === 'denied'"
         >
           <ion-button (click)="tryAgainPerms()" expand="block" strong="true">
             Try again
           </ion-button>
         </ng-container>
         <ng-container
-          *ngIf="videoPermissionStatus === 'granted' && micPermissionStatus === 'granted'"
+          *ngIf="videoPermissionStatus === 'granted' && micPermissionStatus === 'granted' && pushPermissionStatus === 'granted'"
         >
           <ion-button (click)="welcomeCompleted()" expand="block" strong="true">
             let's go <ion-icon slot="end" name="arrow-forward"></ion-icon>

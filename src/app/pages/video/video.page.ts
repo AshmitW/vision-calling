@@ -8,7 +8,6 @@ import interact from 'interactjs';
 import { UserService } from 'src/app/services/user.service';
 import { first } from 'rxjs';
 import { UserInfo } from 'src/app/models/user-info';
-import { AgoraToken } from 'src/app/models/agora-token';
 
 @Component({
   selector: 'app-video',
@@ -24,7 +23,7 @@ export class VideoPage implements OnInit {
   agoraRtcToken: string;
   loading: boolean = true;
   currentUser: UserInfo;
-  type: 'JOIN' | 'INVITE';
+  type: 'JOIN' | 'INVITING' | 'INVITED';
   recieverId: string;
   soloUser: boolean = true;
 
@@ -86,7 +85,7 @@ export class VideoPage implements OnInit {
                   });
                 break;
               }
-              case 'INVITE': {
+              case 'INVITING': {
                 this.recieverId = params['recieverId'];
                 this.userService
                   .inviteCall(this.recieverId, this.visionCode)
@@ -114,6 +113,22 @@ export class VideoPage implements OnInit {
                       }, 500);
                     },
                   });
+                break;
+              }
+              case 'INVITED': {
+                this.agoraRtcToken = params['agoraToken'];
+                if (
+                  !this.visionCode ||
+                  !this.currentUser ||
+                  !this.agoraRtcToken
+                ) {
+                  this.loading = false;
+                  setTimeout(() => {
+                    this.router.navigate(['home'], { replaceUrl: true });
+                  }, 500);
+                  return;
+                }
+                this.startCall();
                 break;
               }
               default: {
@@ -169,6 +184,9 @@ export class VideoPage implements OnInit {
     document
       .getElementById('local-player')
       .classList.add('local-video-player-solo');
+    document
+      .getElementById('remote-container-wrapper')
+      .classList.add('remote-video-wrapper-solo');
   }
 
   turnOffSoloView() {
@@ -178,6 +196,9 @@ export class VideoPage implements OnInit {
     document
       .getElementById('local-player')
       .classList.remove('local-video-player-solo');
+    document
+      .getElementById('remote-container-wrapper')
+      .classList.remove('remote-video-wrapper-solo');
     document
       .getElementById('local-video-container')
       .classList.add('local-video-container');
