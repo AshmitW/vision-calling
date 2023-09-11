@@ -1,5 +1,6 @@
 {
   "hosting": {
+	"site": "vision-calling",
     "public": "www",
     "ignore": [
       "firebase.json",

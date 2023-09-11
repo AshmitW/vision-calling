@@ -7,5 +7,5 @@
 // Firebase
 export const environment = {
   production: true,
-  apiUrl: 'https://vision-calling.web.app/api',
+  apiUrl: 'https://vision-calling-backend.web.app/api',
 };
