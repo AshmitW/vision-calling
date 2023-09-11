@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from 'src/app/services/user.service';
 import { first } from 'rxjs';
 import { UserInfo } from 'src/app/models/user-info';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-live-stream',
@@ -24,6 +25,7 @@ export class LiveStreamPage implements OnInit {
   currentUser: UserInfo;
   type: 'JOIN' | 'CREATE';
   hostId: string;
+  nativePlatform: boolean;
 
   constructor(
     public menuCtrl: MenuController,
@@ -34,6 +36,9 @@ export class LiveStreamPage implements OnInit {
     private loadingCtrl: LoadingController
   ) {
     this.showLoading();
+    if (Capacitor.isNativePlatform()) {
+      this.nativePlatform = true;
+    }
     this.getAllInfo();
   }
 

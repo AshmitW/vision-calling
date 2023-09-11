@@ -8,6 +8,7 @@ import interact from 'interactjs';
 import { UserService } from 'src/app/services/user.service';
 import { first } from 'rxjs';
 import { UserInfo } from 'src/app/models/user-info';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
   selector: 'app-video',
@@ -26,7 +27,8 @@ export class VideoPage implements OnInit {
   type: 'JOIN' | 'INVITING' | 'INVITED';
   recieverId: string;
   soloUser: boolean = true;
-  duration: number = 10000;
+  nativePlatform: boolean;
+
   constructor(
     public menuCtrl: MenuController,
     public rtc: RtcService,
@@ -36,6 +38,9 @@ export class VideoPage implements OnInit {
     private loadingCtrl: LoadingController
   ) {
     this.showLoading();
+    if (Capacitor.isNativePlatform()) {
+      this.nativePlatform = true;
+    }
     this.getAllInfo();
   }
 
