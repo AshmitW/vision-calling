@@ -249,10 +249,12 @@ export class WelcomePage implements OnInit {
         if (notification.notification.extra.type) {
           switch (notification.notification.extra.type) {
             case 'call': {
+              // We pass required values to join same call as invitee
               this.router.navigate(['video'], {
                 queryParams: {
                   callType: 'INVITED',
                   agoraToken: notification.notification.extra.agoraToken,
+                  visionCode: notification.notification.extra.visionCode,
                 },
               });
               break;

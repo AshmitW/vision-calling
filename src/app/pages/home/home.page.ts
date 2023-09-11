@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, MenuController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { UserService } from '../../services/user.service';
+import { first } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -13,6 +15,7 @@ import { Router } from '@angular/router';
 })
 export class HomePage implements OnInit {
   visionCode: string = localStorage.getItem('visionCode');
+  name: string;
   public actionSheetButtons = [
     {
       text: 'Join live stream',
@@ -37,10 +40,13 @@ export class HomePage implements OnInit {
   constructor(
     public menuCtrl: MenuController,
     private router: Router,
+    private userService: UserService,
     private toastController: ToastController
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.getCurrentUserName();
+  }
 
   // Toast template
   async presentToast(message) {
@@ -60,6 +66,18 @@ export class HomePage implements OnInit {
 
   setVisionCode(event) {
     localStorage.setItem('visionCode', event.detail.value);
+  }
+
+  // get Current user's name to display
+  getCurrentUserName() {
+    this.userService
+      .getCurrentUser()
+      .pipe(first())
+      .subscribe({
+        next: (user) => {
+          this.name = user.data.name;
+        },
+      });
   }
 
   routeVideo() {

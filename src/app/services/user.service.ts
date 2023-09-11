@@ -59,6 +59,17 @@ export class UserService {
       );
   }
 
+  // Forgot Password
+  forgotPassword(email: string) {
+    return this.http
+      .get<any>(`${environment.apiUrl}/auth/forgot-password?email=${email}`)
+      .pipe(
+        map((response) => {
+          return response;
+        })
+      );
+  }
+
   // Signup
   signUp(name: string, email: string, password: string) {
     return this.http
@@ -89,6 +100,33 @@ export class UserService {
       );
   }
 
+  // Update user
+  updateProfile(name: string) {
+    return this.http
+      .post<any>(`${environment.apiUrl}/user/update`, {
+        name,
+      })
+      .pipe(
+        map((response) => {
+          return response;
+        })
+      );
+  }
+
+  // Update user
+  changePassword(oldPassword: string, newPassword: string) {
+    return this.http
+      .post<any>(`${environment.apiUrl}/user/change-password`, {
+        oldPassword,
+        newPassword,
+      })
+      .pipe(
+        map((response) => {
+          return response;
+        })
+      );
+  }
+
   // Get all messages with filters
   getAllMessages(skip: number, limit: number) {
     return this.http
@@ -109,8 +147,8 @@ export class UserService {
     return this.http
       .get<any>(`${environment.apiUrl}/msg/all?skip=0&limit=10&msgId=${msgId}`)
       .pipe(
-        map((msge) => {
-          return msge;
+        map((msg) => {
+          return msg;
         })
       );
   }

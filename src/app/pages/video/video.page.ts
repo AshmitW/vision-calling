@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, MenuController } from '@ionic/angular';
+import { IonicModule, MenuController, LoadingController } from '@ionic/angular';
 import { RtcService } from 'src/app/services/rtc.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import interact from 'interactjs';
@@ -17,24 +17,34 @@ import { UserInfo } from 'src/app/models/user-info';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class VideoPage implements OnInit {
+  loading: any;
   audioMuted: boolean;
   videoMuted: boolean;
   visionCode: string = localStorage.getItem('visionCode');
   agoraRtcToken: string;
-  loading: boolean = true;
   currentUser: UserInfo;
   type: 'JOIN' | 'INVITING' | 'INVITED';
   recieverId: string;
   soloUser: boolean = true;
-
+  duration: number = 10000;
   constructor(
     public menuCtrl: MenuController,
     public rtc: RtcService,
     private router: Router,
     private route: ActivatedRoute,
-    private userService: UserService
+    private userService: UserService,
+    private loadingCtrl: LoadingController
   ) {
+    this.showLoading();
     this.getAllInfo();
+  }
+
+  async showLoading() {
+    this.loading = await this.loadingCtrl.create({
+      message: 'Loading',
+    });
+
+    this.loading.present();
   }
 
   ionViewWillEnter() {
@@ -68,7 +78,7 @@ export class VideoPage implements OnInit {
                         !this.currentUser ||
                         !this.agoraRtcToken
                       ) {
-                        this.loading = false;
+                        this.loading.dismiss();
                         setTimeout(() => {
                           this.router.navigate(['home'], { replaceUrl: true });
                         }, 500);
@@ -77,7 +87,7 @@ export class VideoPage implements OnInit {
                       this.startCall();
                     },
                     error: (error) => {
-                      this.loading = false;
+                      this.loading.dismiss();
                       setTimeout(() => {
                         this.router.navigate(['home'], { replaceUrl: true });
                       }, 500);
@@ -98,7 +108,7 @@ export class VideoPage implements OnInit {
                         !this.currentUser ||
                         !this.agoraRtcToken
                       ) {
-                        this.loading = false;
+                        this.loading.dismiss();
                         setTimeout(() => {
                           this.router.navigate(['home'], { replaceUrl: true });
                         }, 500);
@@ -107,7 +117,7 @@ export class VideoPage implements OnInit {
                       this.startCall();
                     },
                     error: (error) => {
-                      this.loading = false;
+                      this.loading.dismiss();
                       setTimeout(() => {
                         this.router.navigate(['home'], { replaceUrl: true });
                       }, 500);
@@ -117,12 +127,13 @@ export class VideoPage implements OnInit {
               }
               case 'INVITED': {
                 this.agoraRtcToken = params['agoraToken'];
+                this.visionCode = params['visionCode'];
                 if (
                   !this.visionCode ||
                   !this.currentUser ||
                   !this.agoraRtcToken
                 ) {
-                  this.loading = false;
+                  this.loading.dismiss();
                   setTimeout(() => {
                     this.router.navigate(['home'], { replaceUrl: true });
                   }, 500);
@@ -137,7 +148,7 @@ export class VideoPage implements OnInit {
             }
           },
           error: (error) => {
-            this.loading = false;
+            this.loading.dismiss();
             setTimeout(() => {
               this.router.navigate(['home'], { replaceUrl: true });
             }, 500);
@@ -157,7 +168,7 @@ export class VideoPage implements OnInit {
         this.currentUser._id,
         this.rtc.rtcDetails
       );
-      this.loading = false;
+      this.loading.dismiss();
       // keep checking if solo user
       this.rtc.soloUserObs.subscribe((soloUser) => {
         if (soloUser) this.turnOnSoloView();
@@ -234,17 +245,26 @@ export class VideoPage implements OnInit {
     this.videoMuted = false;
   }
 
+  toggleCamera() {
+    this.rtc.toggleCameraDevice();
+  }
+
   // Leave call and remove current page from history stack
   async end() {
+    this.loading.present();
     this.userService
       .endRtcSession()
       .pipe(first())
       .subscribe({
         next: async (response) => {
-          await this.rtc.leaveCall(this.rtc.rtcDetails);
-          this.router.navigate(['home'], { replaceUrl: true });
+          this.loading.dismiss();
+          setTimeout(async () => {
+            await this.rtc.leaveCall(this.rtc.rtcDetails);
+            this.router.navigate(['home'], { replaceUrl: true });
+          }, 500);
         },
         error: (error) => {
+          this.loading.dismiss();
           setTimeout(async () => {
             await this.rtc.leaveCall(this.rtc.rtcDetails);
             this.router.navigate(['home'], { replaceUrl: true });

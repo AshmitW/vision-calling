@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, MenuController } from '@ionic/angular';
+import { IonicModule, MenuController, LoadingController } from '@ionic/angular';
 import { RtcService } from 'src/app/services/rtc.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from 'src/app/services/user.service';
@@ -16,11 +16,11 @@ import { UserInfo } from 'src/app/models/user-info';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class LiveStreamPage implements OnInit {
+  loading: any;
   audioMuted: boolean;
   videoMuted: boolean;
   visionCode: string = localStorage.getItem('visionCode');
   agoraRtcToken: string;
-  loading: boolean = true;
   currentUser: UserInfo;
   type: 'JOIN' | 'CREATE';
   hostId: string;
@@ -30,9 +30,19 @@ export class LiveStreamPage implements OnInit {
     public rtc: RtcService,
     private router: Router,
     private route: ActivatedRoute,
-    private userService: UserService
+    private userService: UserService,
+    private loadingCtrl: LoadingController
   ) {
+    this.showLoading();
     this.getAllInfo();
+  }
+
+  async showLoading() {
+    this.loading = await this.loadingCtrl.create({
+      message: 'Loading',
+    });
+
+    this.loading.present();
   }
 
   ionViewWillEnter() {
@@ -66,7 +76,7 @@ export class LiveStreamPage implements OnInit {
                         !this.currentUser ||
                         !this.agoraRtcToken
                       ) {
-                        this.loading = false;
+                        this.loading.dismiss();
                         setTimeout(() => {
                           this.router.navigate(['home'], { replaceUrl: true });
                         }, 500);
@@ -75,7 +85,7 @@ export class LiveStreamPage implements OnInit {
                       this.startStream();
                     },
                     error: (error) => {
-                      this.loading = false;
+                      this.loading.dismiss();
                       setTimeout(() => {
                         this.router.navigate(['home'], { replaceUrl: true });
                       }, 500);
@@ -95,7 +105,7 @@ export class LiveStreamPage implements OnInit {
                         !this.currentUser ||
                         !this.agoraRtcToken
                       ) {
-                        this.loading = false;
+                        this.loading.dismiss();
                         setTimeout(() => {
                           this.router.navigate(['home'], { replaceUrl: true });
                         }, 500);
@@ -104,7 +114,7 @@ export class LiveStreamPage implements OnInit {
                       this.startStream();
                     },
                     error: (error) => {
-                      this.loading = false;
+                      this.loading.dismiss();
                       setTimeout(() => {
                         this.router.navigate(['home'], { replaceUrl: true });
                       }, 500);
@@ -118,7 +128,7 @@ export class LiveStreamPage implements OnInit {
             }
           },
           error: (error) => {
-            this.loading = false;
+            this.loading.dismiss();
             setTimeout(() => {
               this.router.navigate(['home'], { replaceUrl: true });
             }, 500);
@@ -140,7 +150,7 @@ export class LiveStreamPage implements OnInit {
         this.type === 'CREATE' ? 'host' : 'audience',
         this.hostId
       );
-      this.loading = false;
+      this.loading.dismiss();
       // keep checking if host left
       this.rtc.hostLeftObs.subscribe((hostLeft) => {
         if (hostLeft === true) this.end();
@@ -176,22 +186,26 @@ export class LiveStreamPage implements OnInit {
     this.videoMuted = false;
   }
 
+  toggleCamera() {
+    this.rtc.toggleCameraDevice();
+  }
+
   // Leave call and remove current page from history stack
   async end() {
-    this.loading = true;
+    this.loading.present();
     this.userService
       .endRtcSession()
       .pipe(first())
       .subscribe({
         next: (response) => {
-          this.loading = false;
+          this.loading.dismiss();
           setTimeout(async () => {
             await this.rtc.leaveCall(this.rtc.rtcDetails);
             this.router.navigate(['home'], { replaceUrl: true });
           }, 500);
         },
         error: (error) => {
-          this.loading = false;
+          this.loading.dismiss();
           setTimeout(async () => {
             await this.rtc.leaveCall(this.rtc.rtcDetails);
             this.router.navigate(['home'], { replaceUrl: true });

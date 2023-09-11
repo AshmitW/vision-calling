@@ -63,6 +63,7 @@ export class SignupPage implements OnInit {
       .subscribe({
         next: (data) => {
           this.loading = false;
+          this.presentToast('Please check your email to activate your account');
           // set a short and small timer of 500 miliseconds to allow the loading bar to turn off before changing routes
           setTimeout(() => {
             this.router.navigate(['login'], { replaceUrl: true });

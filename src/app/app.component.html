@@ -18,8 +18,7 @@
                 <ion-icon
                   aria-hidden="true"
                   slot="start"
-                  [ios]="p.icon + '-outline'"
-                  [md]="p.icon + '-sharp'"
+                  name="{{ p.icon }}"
                 ></ion-icon>
                 <ion-label>{{ p.title }}</ion-label>
               </ion-item>
@@ -35,8 +34,7 @@
                 <ion-icon
                   aria-hidden="true"
                   slot="start"
-                  [ios]="l.icon + '-outline'"
-                  [md]="l.icon + '-sharp'"
+                  name="{{ l.icon }}"
                 ></ion-icon>
                 <ion-label>{{ l.title }}</ion-label>
               </ion-item>

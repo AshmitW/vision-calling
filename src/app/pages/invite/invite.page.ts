@@ -65,7 +65,6 @@ export class InvitePage implements OnInit {
       this.router.navigate(['home']);
       return;
     }
-
     this.router.navigate(['video'], {
       queryParams: {
         callType: 'INVITING',

@@ -18,11 +18,14 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Home</ion-title>
+      <ion-title size="large">Hello, </ion-title>
     </ion-toolbar>
   </ion-header>
   <div class="input-group">
     <ion-list>
+      <ion-item style="--border-style: none">
+        <ion-input readonly="true" [(ngModel)]="name"></ion-input>
+      </ion-item>
       <ion-item style="--border-style: none">
         <ion-input
           label="Vision Code"
@@ -38,7 +41,7 @@
     <br />
     <ion-button expand="block" (click)="routeVideo()">
       <ion-icon slot="start" name="call"></ion-icon>
-      Enter Call
+      Enter Video Call
     </ion-button>
   </div>
   <ion-fab slot="fixed" vertical="bottom" horizontal="start">

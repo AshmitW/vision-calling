@@ -1,0 +1,17 @@
+ion-content {
+	--padding-start: 10%;
+	--padding-end: 10%;
+}
+
+.input-group {
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+@media (min-width: 1000px) {
+	ion-content {
+		--padding-start: 30%;
+		--padding-end: 30%;
+	}
+}

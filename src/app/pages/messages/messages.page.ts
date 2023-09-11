@@ -10,6 +10,7 @@ import {
 import { UserService } from '../../services/user.service';
 import { first } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 @Component({
   selector: 'app-messages',
@@ -60,13 +61,27 @@ export class MessagesPage implements OnInit {
     this.checkIfOpenMsg();
     this.getAllMessages();
     this.getCurrentUser();
+    this.checkIfMsgReceived();
   }
 
   checkIfOpenMsg() {
     this.route.queryParams.subscribe(async (params) => {
       this.openMsgId = await params['openMsgId'];
-      if (this.openMsgId) this.getOneMessage();
+      if (this.openMsgId) this.getOneMessage(this.openMsgId);
     });
+  }
+
+  async checkIfMsgReceived() {
+    await LocalNotifications.addListener(
+      'localNotificationReceived',
+      async (notification) => {
+        console.log('localNotificationReceived', notification);
+        if (notification.extra.type === 'message') {
+          if (notification.extra.msgId)
+            this.getOneMessage(notification.extra.msgId);
+        }
+      }
+    );
   }
 
   // Toast template
@@ -80,9 +95,9 @@ export class MessagesPage implements OnInit {
     await toast.present();
   }
 
-  getOneMessage() {
+  getOneMessage(msgId: string) {
     this.userService
-      .getOneMessage(this.openMsgId)
+      .getOneMessage(msgId)
       .pipe(first())
       .subscribe({
         next: (message) => {

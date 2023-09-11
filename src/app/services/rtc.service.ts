@@ -35,6 +35,7 @@ export class RtcService {
   remoteUsers: RtcUserInfo[] = [];
   // Remote users where we store the info received from our DB for diplay names
   remoteUsersDB = [];
+  cameraDevices = [];
   private hostLeft: Subject<any> = new Subject<any>();
   public hostLeftObs = this.hostLeft.asObservable();
   private soloUser: Subject<any> = new Subject<any>();
@@ -64,6 +65,7 @@ export class RtcService {
     this.rtcDetails.localVideoTrack = await AgoraRTC.createCameraVideoTrack({
       encoderConfig: '720p',
     });
+    this.cameraDevices = await AgoraRTC.getCameras();
     if (role !== 'audience') {
       //   this.rtcDetails.localAudioTrack.play();
       this.rtcDetails.localVideoTrack.play('local-player');
@@ -72,6 +74,15 @@ export class RtcService {
         this.rtcDetails.localVideoTrack,
       ]);
     }
+  }
+
+  // to toggle camera devices
+  toggleCameraDevice() {
+    this.cameraDevices.forEach((camera) => {
+      if (this.rtcDetails.localVideoTrack.getTrackLabel !== camera.label) {
+        this.rtcDetails.localVideoTrack.setDevice(camera.deviceId);
+      }
+    });
   }
 
   // To subscribe to all events so we can get remote users and keep a long of all events

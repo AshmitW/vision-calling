@@ -19,7 +19,10 @@ register();
   imports: [IonicModule, RouterLink, RouterLinkActive, CommonModule],
 })
 export class AppComponent {
-  public appPages = [{ title: 'Home', url: '/home', icon: 'home' }];
+  public appPages = [
+    { title: 'Home', url: '/home', icon: 'home' },
+    { title: 'Profile', url: '/profile', icon: 'person' },
+  ];
   public logoutPages = [{ title: 'Logout', func: 'logout()', icon: 'log-out' }];
   private isLogged: boolean;
   loading: boolean = false;
@@ -27,6 +30,11 @@ export class AppComponent {
   constructor(private userService: UserService, private router: Router) {
     // isLogged is use to check if USER has logged in.
     this.isLogged = this.userService.tokenValue ? true : false;
+    // possibly fixed, hence commented
+    // if localstorage with visionCode is not set, invite call can break so we set an empty value
+    // if (!localStorage.getItem('visionCode')) {
+    //   localStorage.setItem('visionCode', '');
+    // }
     // Check if User has done the first time setup, if not show it
     if (!localStorage.getItem('welcomeCompleted')) {
       this.router.navigateByUrl('/welcome');
@@ -106,10 +114,12 @@ export class AppComponent {
         if (notification.notification.extra.type) {
           switch (notification.notification.extra.type) {
             case 'call': {
+              // We pass required values to join same call as invitee
               this.router.navigate(['video'], {
                 queryParams: {
                   callType: 'INVITED',
                   agoraToken: notification.notification.extra.agoraToken,
+                  visionCode: notification.notification.extra.visionCode,
                 },
               });
               break;

@@ -1,0 +1,79 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button auto-hide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Profile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-segment [(ngModel)]="segmentValue" color="danger">
+        <ion-segment-button value="updateProfile">
+          <ion-label>Update Profile</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="changePassword">
+          <ion-label>Change Password</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-toolbar>
+  </ion-header>
+  <div [ngSwitch]="segmentValue">
+    <div *ngSwitchCase="'updateProfile'">
+      <ion-list>
+        <ion-item>
+          <ion-input
+            label="Name"
+            labelPlacement="floating"
+            type="text"
+            helperText="Please enter any name you wanna identify as"
+            [(ngModel)]="name"
+            placeholder="abc"
+          ></ion-input>
+        </ion-item>
+      </ion-list>
+      <ion-button
+        style="text-transform: none"
+        (click)="updateProfile()"
+        expand="block"
+        strong="true"
+        >Update</ion-button
+      >
+    </div>
+
+    <div *ngSwitchCase="'changePassword'">
+      <ion-list>
+        <ion-item>
+          <ion-input
+            label="Current Password"
+            labelPlacement="floating"
+            type="password"
+            minlength="8"
+            [(ngModel)]="currentPassword"
+            placeholder="********"
+          ></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-input
+            label="New Password"
+            labelPlacement="floating"
+            type="password"
+            minlength="8"
+            [(ngModel)]="newPassword"
+            placeholder="********"
+          ></ion-input>
+        </ion-item>
+      </ion-list>
+      <ion-button
+        style="text-transform: none"
+        (click)="changePassword()"
+        expand="block"
+        strong="true"
+        >Change Password</ion-button
+      >
+    </div>
+  </div>
+  <ion-loading [isOpen]="loading" message="Loading"></ion-loading>
+</ion-content>
