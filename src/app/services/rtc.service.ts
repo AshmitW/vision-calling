@@ -61,13 +61,14 @@ export class RtcService {
       this.liveHostId = hostId;
     }
     await rtc.client.join(this.options.appId, visionCode, token, uid);
-    this.rtcDetails.localAudioTrack =
-      await AgoraRTC.createMicrophoneAudioTrack();
-    this.rtcDetails.localVideoTrack = await AgoraRTC.createCameraVideoTrack({
-      encoderConfig: '720p',
-    });
-    // Do not play or publish local track if the user is an viewer of a live stream
+    // Do not create, play or publish local track if the user is an viewer of a live stream
     if (role !== 'audience') {
+      this.rtcDetails.localAudioTrack =
+        await AgoraRTC.createMicrophoneAudioTrack();
+      this.rtcDetails.localVideoTrack = await AgoraRTC.createCameraVideoTrack({
+        encoderConfig: '720p',
+      });
+      // Never play local audio track as the user should not hear their own voice
       //   this.rtcDetails.localAudioTrack.play();
       this.rtcDetails.localVideoTrack.play('local-player');
       await rtc.client.publish([
