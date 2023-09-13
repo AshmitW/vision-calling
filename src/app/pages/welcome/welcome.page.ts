@@ -195,22 +195,6 @@ export class WelcomePage implements OnInit {
       console.error('Registration error: ', err.error);
     });
 
-    await PushNotifications.addListener(
-      'pushNotificationReceived',
-      async (notification) => {
-        console.log('Push notification received: ', notification);
-        const options = {
-          title: notification.data.title,
-          body: notification.data.body,
-          id: Math.floor(Math.random() * Math.random()),
-          extra: notification.data,
-        };
-        await LocalNotifications.schedule({
-          notifications: [options],
-        });
-      }
-    );
-
     await FirebaseMessaging.addListener(
       'notificationReceived',
       async (event) => {
@@ -226,19 +210,6 @@ export class WelcomePage implements OnInit {
         await LocalNotifications.schedule({
           notifications: [options],
         });
-      }
-    );
-    await FirebaseMessaging.addListener(
-      'notificationActionPerformed',
-      (event) => {
-        console.log('notificationActionPerformed: ', { event });
-      }
-    );
-
-    await LocalNotifications.addListener(
-      'localNotificationReceived',
-      async (notification) => {
-        console.log('localNotificationReceived', notification);
       }
     );
 
@@ -274,20 +245,7 @@ export class WelcomePage implements OnInit {
         }
       }
     );
-
-    await PushNotifications.addListener(
-      'pushNotificationActionPerformed',
-      async (notification) => {
-        console.log(
-          'Push notification action performed',
-          notification,
-          notification.actionId,
-          notification.inputValue
-        );
-      }
-    );
     await PushNotifications.register();
-    this.getDeliveredNotifications();
   }
 
   async registerNotifications() {
@@ -304,11 +262,5 @@ export class WelcomePage implements OnInit {
 
     await PushNotifications.register();
     this.addListeners();
-  }
-
-  async getDeliveredNotifications() {
-    const notificationList =
-      await PushNotifications.getDeliveredNotifications();
-    console.log('delivered notifications', notificationList);
   }
 }

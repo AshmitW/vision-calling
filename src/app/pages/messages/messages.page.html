@@ -84,7 +84,8 @@
       <ion-footer>
         <ion-item color="danger">
           <ion-input
-            (ionChange)="sendMessage(selectedUser._id)"
+            style="margin: 10px"
+            (ionChange)="sendMessage(msg.receiver._id)"
             placeholder="Enter text"
             [(ngModel)]="newText"
           ></ion-input>
@@ -165,6 +166,7 @@
       <ion-footer *ngIf="sendMsgModalStep === 2">
         <ion-item color="danger">
           <ion-input
+            style="margin: 10px"
             (ionChange)="sendMessage(selectedUser._id)"
             placeholder="Enter text"
             [(ngModel)]="newText"

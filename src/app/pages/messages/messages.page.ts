@@ -6,6 +6,7 @@ import {
   ToastController,
   IonModal,
   InfiniteScrollCustomEvent,
+  ModalController,
 } from '@ionic/angular';
 import { UserService } from '../../services/user.service';
 import { first } from 'rxjs';
@@ -54,7 +55,8 @@ export class MessagesPage implements OnInit {
     private userService: UserService,
     private toastController: ToastController,
     public _zone: NgZone,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private modalController: ModalController
   ) {}
 
   ngOnInit() {
@@ -152,7 +154,7 @@ export class MessagesPage implements OnInit {
     });
   }
 
-  sendMessage(id) {
+  sendMessage(id: string) {
     this.loading = true;
     this.userService
       .sendMessage(id, this.newText)
@@ -174,7 +176,6 @@ export class MessagesPage implements OnInit {
 
   onDidDismissMsgModal() {
     this.isMsgModalOpen = false;
-    this.msg = {};
   }
 
   openMsgModal(msg) {
@@ -185,6 +186,7 @@ export class MessagesPage implements OnInit {
 
   cancelMsgModal() {
     this.isMsgModalOpen = false;
+    this.modalController.dismiss();
   }
 
   getUsers() {
@@ -238,6 +240,7 @@ export class MessagesPage implements OnInit {
 
   cancelSendMsgModal() {
     this.isSendMsgModalOpen = false;
+    this.modalController.dismiss();
     this.sendMsgModalStep = 1;
   }
 

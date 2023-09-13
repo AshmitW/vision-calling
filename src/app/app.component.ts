@@ -30,11 +30,6 @@ export class AppComponent {
   constructor(private userService: UserService, private router: Router) {
     // isLogged is use to check if USER has logged in.
     this.isLogged = this.userService.tokenValue ? true : false;
-    // possibly fixed, hence commented
-    // if localstorage with visionCode is not set, invite call can break so we set an empty value
-    // if (!localStorage.getItem('visionCode')) {
-    //   localStorage.setItem('visionCode', '');
-    // }
     // Check if User has done the first time setup, if not show it
     if (!localStorage.getItem('welcomeCompleted')) {
       this.router.navigateByUrl('/welcome');
@@ -60,22 +55,6 @@ export class AppComponent {
       console.error('Registration error: ', err.error);
     });
 
-    await PushNotifications.addListener(
-      'pushNotificationReceived',
-      async (notification) => {
-        console.log('Push notification received: ', notification);
-        const options = {
-          title: notification.data.title,
-          body: notification.data.body,
-          id: Math.floor(Math.random() * Math.random()),
-          extra: notification.data,
-        };
-        await LocalNotifications.schedule({
-          notifications: [options],
-        });
-      }
-    );
-
     await FirebaseMessaging.addListener(
       'notificationReceived',
       async (event) => {
@@ -91,19 +70,6 @@ export class AppComponent {
         await LocalNotifications.schedule({
           notifications: [options],
         });
-      }
-    );
-    await FirebaseMessaging.addListener(
-      'notificationActionPerformed',
-      (event) => {
-        console.log('notificationActionPerformed: ', { event });
-      }
-    );
-
-    await LocalNotifications.addListener(
-      'localNotificationReceived',
-      async (notification) => {
-        console.log('localNotificationReceived', notification);
       }
     );
 
@@ -139,20 +105,7 @@ export class AppComponent {
         }
       }
     );
-
-    await PushNotifications.addListener(
-      'pushNotificationActionPerformed',
-      async (notification) => {
-        console.log(
-          'Push notification action performed',
-          notification,
-          notification.actionId,
-          notification.inputValue
-        );
-      }
-    );
     await PushNotifications.register();
-    this.getDeliveredNotifications();
   }
 
   async registerNotifications() {
@@ -169,12 +122,6 @@ export class AppComponent {
 
     await PushNotifications.register();
     this.addListeners();
-  }
-
-  async getDeliveredNotifications() {
-    const notificationList =
-      await PushNotifications.getDeliveredNotifications();
-    console.log('delivered notifications', notificationList);
   }
 
   // Calling the logout function in service
