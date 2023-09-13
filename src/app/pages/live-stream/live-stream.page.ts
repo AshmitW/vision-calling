@@ -99,6 +99,11 @@ export class LiveStreamPage implements OnInit {
                 break;
               }
               case 'CREATE': {
+                // Modify vision code if creating live stream so there are never 2 publishers with same code
+                this.visionCode =
+                  this.visionCode +
+                  '-live-' +
+                  (Math.random() + 1).toString(36).substring(2);
                 this.userService
                   .createStream(this.visionCode)
                   .pipe(first())

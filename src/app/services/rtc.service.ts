@@ -56,14 +56,17 @@ export class RtcService {
     role: ClientRole = 'host',
     hostId = ''
   ) {
-    if (this.mode === 'live') await rtc.client.setClientRole(role);
-    this.liveHostId = hostId;
+    if (this.mode === 'live') {
+      await rtc.client.setClientRole(role);
+      this.liveHostId = hostId;
+    }
     await rtc.client.join(this.options.appId, visionCode, token, uid);
     this.rtcDetails.localAudioTrack =
       await AgoraRTC.createMicrophoneAudioTrack();
     this.rtcDetails.localVideoTrack = await AgoraRTC.createCameraVideoTrack({
       encoderConfig: '720p',
     });
+    // Do not play or publish local track if the user is an viewer of a live stream
     if (role !== 'audience') {
       //   this.rtcDetails.localAudioTrack.play();
       this.rtcDetails.localVideoTrack.play('local-player');
@@ -74,9 +77,11 @@ export class RtcService {
     }
   }
 
-  // to toggle camera devices
+  // to toggle camera devices (made to switch from front to back camera and vice versa)
   async toggleCameraDevice() {
+    // Get all camera devices
     const cameraDevices = await AgoraRTC.getCameras();
+    // Filter the devices which is not currently active
     const filteredCamera = cameraDevices.filter(
       (camera) =>
         camera.label !== this.rtcDetails.localVideoTrack.getTrackLabel()
@@ -84,7 +89,7 @@ export class RtcService {
     this.rtcDetails.localVideoTrack.setDevice(filteredCamera[0].deviceId);
   }
 
-  // To subscribe to all events so we can get remote users and keep a long of all events
+  // Subscribe to all events so we can get remote users and keep a log of all events
   agoraServerEvents(rtc: RtcInfo, uid1?: number, uid2?: number) {
     rtc.client.on('user-published', async (user, mediaType) => {
       // All console logs below this, output with an extra code at the end to make it easier to pinpoint origin of console
@@ -132,8 +137,10 @@ export class RtcService {
       this.remoteUsersDB = this.remoteUsersDB.filter(
         (item) => item._id !== user.uid
       );
-      console.log('LEFT LENGTH', this.remoteUsersDB.length);
+      // Checks if the user is the only one left in the call
+      // This is used to update the UI if its just user in call
       this.soloUser.next(this.remoteUsersDB.length === 0 ? true : false);
+      // Checks if the live stream host left the session
       if (this.mode === 'live' && this.liveHostId === user.uid)
         this.hostLeft.next(true);
     });
