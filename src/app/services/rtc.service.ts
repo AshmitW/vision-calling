@@ -120,7 +120,6 @@ export class RtcService {
         .subscribe({
           next: (userDB) => {
             this.remoteUsersDB.push(userDB.data);
-            console.log('JOINED LENGTH', this.remoteUsersDB.length);
             this.soloUser.next(this.remoteUsersDB.length === 0 ? true : false);
           },
           error: (error) => {},
