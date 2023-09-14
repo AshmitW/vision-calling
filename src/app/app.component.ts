@@ -43,8 +43,8 @@ export class AppComponent {
   async addListeners() {
     await PushNotifications.addListener('registration', async (ptoken) => {
       console.info('Push Registration token: ', ptoken.value);
-      let pushToken = ptoken.value; // Push token for Android
-      // Get FCM token instead the APN one returned by Capacitor
+      let pushToken = ptoken.value; // Push token from Capacitor
+      // Get FCM token instead of the one returned by Capacitor
       const { token } = await FirebaseMessaging.getToken();
       console.info('FCM Registration token: ', token);
       pushToken = token;
