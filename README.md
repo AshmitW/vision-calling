@@ -1,6 +1,6 @@
 # Vision Calling
 
-This project contains the frontend code for [Vision Calling](https://vision-calling.web.app), an RTC client
+This project contains the frontend code for [Vision Calling](https://vision-calling.web.app), a RTC client
 
 ## Running the Application
 
